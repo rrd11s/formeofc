@@ -54,13 +54,13 @@ local z=false
 local A
 
 local B={
-{Name="Gotham Medium",Font=Enum.Font.GothamMedium},
-{Name="Gotham Bold",Font=Enum.Font.GothamBold},
-{Name="Source Sans",Font=Enum.Font.SourceSansBold},
+{Name="Gotham Medium",Font=Enum.Font.Arcade},
+{Name="Gotham Bold",Font=Enum.Font.Arcade},
+{Name="Source Sans",Font=Enum.Font.Arcade},
 {Name="Arcade",Font=Enum.Font.Arcade},
 {Name="Code",Font=Enum.Font.Code}
 }
-local C=1
+local C=4
 
 local D={
 {Name="White",Color=Color3.fromRGB(255,255,255)},
@@ -112,7 +112,7 @@ local L=Instance.new"TextLabel"
 L.Size=UDim2.new(0,320,0,24)
 L.Position=UDim2.new(0,16,0,12)
 L.BackgroundTransparency=1
-L.Font=Enum.Font.GothamBold
+L.Font=Enum.Font.Arcade
 L.TextSize=12
 L.TextColor3=Color3.fromRGB(220,225,240)
 L.TextXAlignment=Enum.TextXAlignment.Left
@@ -137,25 +137,41 @@ end)
 end
 end)
 
+local M=25
+local N=35
+local Offset=35
+
 task.spawn(function()
 while true do
 if k and w then
-pcall(function()
-if mouse1click then
-mouse1click()
+    local low=math.max(1,tonumber(M) or 25)
+    local high=math.max(low,tonumber(N) or low)
+    local intervalMs=low
+    if x and tonumber(Offset) and Offset>0 then
+        local delta=math.random(-math.floor(Offset),math.floor(Offset))
+        low=math.max(1,low+delta)
+        high=math.max(low,high+delta)
+    end
+    intervalMs=math.random(math.floor(low),math.floor(high))
+
+    local clicked=pcall(function()
+        if type(mouse1click)=="function" then
+            mouse1click()
+        elseif f and h then
+            f:SendMouseButtonEvent(h.X,h.Y,0,true,game,1)
+            task.wait()
+            f:SendMouseButtonEvent(h.X,h.Y,0,false,game,1)
+        else
+            error("No supported mouse input method")
+        end
+    end)
+    if not clicked then
+        task.wait(0.1)
+    else
+        task.wait(intervalMs/1000)
+    end
 else
-f:SendMouseButtonEvent(h.X,h.Y,0,true,game,1)
-task.wait(0.005)
-f:SendMouseButtonEvent(h.X,h.Y,0,false,game,1)
-end
-end)
-local M=0.025
-if x then
-M=math.max(0.005,M+(math.random(-35,35)/1000))
-end
-task.wait(M)
-else
-task.wait(0.1)
+    task.wait(0.1)
 end
 end
 end)
@@ -358,13 +374,74 @@ end)
 
 
 
-local M=25
-local N=35
-
 local O=Enum.KeyCode.F
 local P=Enum.KeyCode.Zero
 local Q=25
 local R=false
+
+-- UI theme / sky presets
+local ThemeIndex=1
+local SkyIndex=1
+local ThemeList={
+    {Name="Aesthetic",Accent=Color3.fromRGB(242,120,255),AccentSoft=Color3.fromRGB(95,45,120),Card=Color3.fromRGB(42,24,52),Panel=Color3.fromRGB(15,9,24),Card2=Color3.fromRGB(31,20,40),Button=Color3.fromRGB(50,28,63),ButtonHover=Color3.fromRGB(70,38,88),Text=Color3.fromRGB(255,245,255),Muted=Color3.fromRGB(172,145,184),OnDot=Color3.fromRGB(255,255,255),RoseDanger=Color3.fromRGB(255,82,110)},
+    {Name="Lavender",Accent=Color3.fromRGB(201,148,255),AccentSoft=Color3.fromRGB(83,59,116),Card=Color3.fromRGB(37,27,50),Panel=Color3.fromRGB(16,11,25),Card2=Color3.fromRGB(29,22,40),Button=Color3.fromRGB(47,33,62),ButtonHover=Color3.fromRGB(67,46,86),Text=Color3.fromRGB(249,243,255),Muted=Color3.fromRGB(163,147,181),OnDot=Color3.fromRGB(255,255,255),RoseDanger=Color3.fromRGB(255,82,110)},
+    {Name="Rose",Accent=Color3.fromRGB(255,119,181),AccentSoft=Color3.fromRGB(104,46,72),Card=Color3.fromRGB(49,25,38),Panel=Color3.fromRGB(25,10,18),Card2=Color3.fromRGB(38,19,30),Button=Color3.fromRGB(61,28,44),ButtonHover=Color3.fromRGB(82,36,58),Text=Color3.fromRGB(255,243,249),Muted=Color3.fromRGB(185,146,163),OnDot=Color3.fromRGB(255,255,255),RoseDanger=Color3.fromRGB(255,82,110)},
+    {Name="Mint",Accent=Color3.fromRGB(106,235,199),AccentSoft=Color3.fromRGB(39,87,76),Card=Color3.fromRGB(24,43,40),Panel=Color3.fromRGB(9,21,19),Card2=Color3.fromRGB(19,34,32),Button=Color3.fromRGB(30,58,53),ButtonHover=Color3.fromRGB(40,78,70),Text=Color3.fromRGB(240,255,250),Muted=Color3.fromRGB(139,179,169),OnDot=Color3.fromRGB(255,255,255),RoseDanger=Color3.fromRGB(255,82,110)},
+    {Name="Ocean",Accent=Color3.fromRGB(102,196,255),AccentSoft=Color3.fromRGB(38,77,110),Card=Color3.fromRGB(23,34,48),Panel=Color3.fromRGB(8,17,27),Card2=Color3.fromRGB(18,27,39),Button=Color3.fromRGB(28,48,66),ButtonHover=Color3.fromRGB(38,65,86),Text=Color3.fromRGB(239,250,255),Muted=Color3.fromRGB(139,169,185),OnDot=Color3.fromRGB(255,255,255),RoseDanger=Color3.fromRGB(255,82,110)}
+}
+local SkyList={"Default","Soft Night","Aurora","Sunset","Cloudy"}
+
+local function ApplySkyPreset(name)
+    pcall(function()
+        local Lighting=game:GetService("Lighting")
+        local sky=Lighting:FindFirstChildOfClass("Sky")
+        if not sky then
+            sky=Instance.new("Sky")
+            sky.Parent=Lighting
+        end
+        if name=="Default" then
+            sky.SkyboxBk="rbxasset://sky/sky512_bk.tex"
+            sky.SkyboxDn="rbxasset://sky/sky512_dn.tex"
+            sky.SkyboxFt="rbxasset://sky/sky512_ft.tex"
+            sky.SkyboxLf="rbxasset://sky/sky512_lf.tex"
+            sky.SkyboxRt="rbxasset://sky/sky512_rt.tex"
+            sky.SkyboxUp="rbxasset://sky/sky512_up.tex"
+        elseif name=="Soft Night" then
+            sky.SkyboxBk="rbxassetid://159454299"
+            sky.SkyboxDn="rbxassetid://159454296"
+            sky.SkyboxFt="rbxassetid://159454293"
+            sky.SkyboxLf="rbxassetid://159454286"
+            sky.SkyboxRt="rbxassetid://159454300"
+            sky.SkyboxUp="rbxassetid://159454288"
+        elseif name=="Aurora" then
+            sky.SkyboxBk="rbxassetid://701868475"
+            sky.SkyboxDn="rbxassetid://701868694"
+            sky.SkyboxFt="rbxassetid://701868088"
+            sky.SkyboxLf="rbxassetid://701868244"
+            sky.SkyboxRt="rbxassetid://701868307"
+            sky.SkyboxUp="rbxassetid://701868720"
+        elseif name=="Sunset" then
+            sky.SkyboxBk="rbxassetid://570557514"
+            sky.SkyboxDn="rbxassetid://570557775"
+            sky.SkyboxFt="rbxassetid://570557620"
+            sky.SkyboxLf="rbxassetid://570557659"
+            sky.SkyboxRt="rbxassetid://570557664"
+            sky.SkyboxUp="rbxassetid://570557686"
+        elseif name=="Cloudy" then
+            sky.SkyboxBk="rbxassetid://271042516"
+            sky.SkyboxDn="rbxassetid://271077243"
+            sky.SkyboxFt="rbxassetid://271042556"
+            sky.SkyboxLf="rbxassetid://271042310"
+            sky.SkyboxRt="rbxassetid://271042467"
+            sky.SkyboxUp="rbxassetid://271077958"
+        end
+    end)
+end
+
+local CurrentTheme=ThemeList[ThemeIndex]
+local ApplyTheme
+local NextTheme
+local NextSky
 
 local S=false
 local T=10
@@ -387,7 +464,7 @@ end
 
 
 local X=Instance.new"ScreenGui"
-X.Name="SleekDashboardMenu"
+X.Name="4JK"
 X.ResetOnSpawn=false
 X.IgnoreGuiInset=true
 X.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
@@ -396,14 +473,20 @@ X.Parent=H
 
 local Y=Instance.new"Frame"
 Y.Name="MainFrame"
-Y.Size=UDim2.new(0,720,0,500)
-Y.Position=UDim2.new(0.5,-360,0.5,-250)
-Y.BackgroundColor3=Color3.fromRGB(16,17,22)
+Y.Size=UDim2.new(0,650,0,440)
+Y.Position=UDim2.new(0.5,-325,0.5,-220)
+Y.BackgroundColor3=Color3.fromRGB(15,9,24)
 Y.BorderSizePixel=0
+local aestheticGradient=Instance.new("UIGradient")
+aestheticGradient.Rotation=135
+aestheticGradient.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(15,9,24)),ColorSequenceKeypoint.new(0.55,Color3.fromRGB(42,24,52)),ColorSequenceKeypoint.new(1,Color3.fromRGB(10,6,18))})
+aestheticGradient.Parent=Y
 Y.Visible=false
 Y.Active=true
 Y.Draggable=true
 Y.Parent=X
+Y:SetAttribute("Theme","Aesthetic")
+Y:SetAttribute("MenuName","4JK")
 
 local Z=Instance.new"UICorner"
 Z.CornerRadius=UDim.new(0,12)
@@ -447,10 +530,17 @@ aa.Size=UDim2.new(1,0,0,62)
 aa.BackgroundTransparency=1
 aa.Parent=Y
 
+local headerAccent=Instance.new("Frame")
+headerAccent.Size=UDim2.new(0,42,0,2)
+headerAccent.Position=UDim2.new(0,12,1,-2)
+headerAccent.BackgroundColor3=Color3.fromRGB(126,110,255)
+headerAccent.BorderSizePixel=0
+headerAccent.Parent=aa
+
 local ab=Instance.new"Frame"
 ab.Name="SearchFrame"
-ab.Size=UDim2.new(0,300,0,34)
-ab.Position=UDim2.new(0,54,0,14)
+ab.Size=UDim2.new(0,250,0,30)
+ab.Position=UDim2.new(0,50,0,12)
 ab.BackgroundColor3=Color3.fromRGB(25,27,34)
 ab.BorderSizePixel=0
 ab.Parent=aa
@@ -463,7 +553,7 @@ local ad=Instance.new"TextLabel"
 ad.Size=UDim2.new(0,28,1,0)
 ad.BackgroundTransparency=1
 ad.Text="⌕"
-ad.Font=Enum.Font.GothamMedium
+ad.Font=Enum.Font.Arcade
 ad.TextSize=20
 ad.TextColor3=Color3.fromRGB(115,120,135)
 ad.Parent=ab
@@ -474,12 +564,12 @@ ae.Size=UDim2.new(1,-36,1,0)
 ae.Position=UDim2.new(0,32,0,0)
 ae.BackgroundTransparency=1
 ae.ClearTextOnFocus=false
-ae.PlaceholderText="Search in this tab.."
+ae.PlaceholderText="Search settings..."
 ae.PlaceholderColor3=Color3.fromRGB(100,104,118)
 ae.Text=""
 ae.TextColor3=Color3.fromRGB(225,228,238)
 ae.TextSize=12
-ae.Font=Enum.Font.Gotham
+ae.Font=Enum.Font.Arcade
 ae.TextXAlignment=Enum.TextXAlignment.Left
 ae.Parent=ab
 
@@ -487,22 +577,33 @@ local af=Instance.new"TextLabel"
 af.Size=UDim2.new(0,120,0,24)
 af.Position=UDim2.new(0,12,0,4)
 af.BackgroundTransparency=1
-af.Text="Script"
-af.Font=Enum.Font.GothamBold
+af.Text="4JK"
+af.Font=Enum.Font.Arcade
 af.TextSize=13
 af.TextColor3=Color3.fromRGB(235,237,245)
 af.TextXAlignment=Enum.TextXAlignment.Left
 af.Parent=aa
 
+local af2=Instance.new"TextLabel"
+af2.Size=UDim2.new(0,180,0,16)
+af2.Position=UDim2.new(0,12,0,24)
+af2.BackgroundTransparency=1
+af2.Text="aesthetic control panel"
+af2.Font=Enum.Font.Arcade
+af2.TextSize=9
+af2.TextColor3=Color3.fromRGB(105,110,125)
+af2.TextXAlignment=Enum.TextXAlignment.Left
+af2.Parent=aa
+
 local ag=Instance.new"TextButton"
-ag.Size=UDim2.new(0,34,0,34)
-ag.Position=UDim2.new(1,-48,0,14)
+ag.Size=UDim2.new(0,30,0,30)
+ag.Position=UDim2.new(1,-42,0,12)
 ag.BackgroundColor3=Color3.fromRGB(28,30,38)
 ag.BorderSizePixel=0
-ag.Text="▪▪\n▪▪"
+ag.Text="≡"
 ag.TextSize=9
 ag.TextColor3=Color3.fromRGB(215,218,230)
-ag.Font=Enum.Font.GothamBold
+ag.Font=Enum.Font.Arcade
 ag.Parent=aa
 
 local ah=Instance.new"UICorner"
@@ -510,8 +611,8 @@ ah.CornerRadius=UDim.new(0,9)
 ah.Parent=ag
 
 local ai=Instance.new"Frame"
-ai.Size=UDim2.new(0,48,1,-76)
-ai.Position=UDim2.new(0,10,0,66)
+ai.Size=UDim2.new(0,44,1,-66)
+ai.Position=UDim2.new(0,8,0,58)
 ai.BackgroundColor3=Color3.fromRGB(19,20,26)
 ai.BorderSizePixel=0
 ai.Parent=Y
@@ -531,8 +632,8 @@ al.PaddingTop=UDim.new(0,8)
 al.Parent=ai
 
 local am=Instance.new"Frame"
-am.Size=UDim2.new(1,-72,1,-76)
-am.Position=UDim2.new(0,68,0,66)
+am.Size=UDim2.new(1,-62,1,-66)
+am.Position=UDim2.new(0,60,0,58)
 am.BackgroundTransparency=1
 am.Parent=Y
 
@@ -562,11 +663,11 @@ au.Frame.Visible=av and ae.Text==""
 local aw=ao[at]
 if aw then
 c:Create(aw.Btn,TweenInfo.new(0.16),{
-BackgroundColor3=av and Color3.fromRGB(43,48,67)or Color3.fromRGB(25,27,34),
-TextColor3=av and Color3.fromRGB(255,255,255)or Color3.fromRGB(110,115,132)
+BackgroundColor3=av and CurrentTheme.AccentSoft or CurrentTheme.Card2,
+TextColor3=av and CurrentTheme.Text or CurrentTheme.Muted
 }):Play()
 c:Create(aw.Icon,TweenInfo.new(0.16),{
-TextColor3=av and Color3.fromRGB(255,255,255)or Color3.fromRGB(110,115,132)
+TextColor3=av and CurrentTheme.Text or CurrentTheme.Muted
 }):Play()
 end
 end
@@ -620,7 +721,7 @@ ay.Size=UDim2.new(1,-18,0,19)
 ay.Position=UDim2.new(0,10,0,5)
 ay.BackgroundTransparency=1
 ay.Text=av.DisplayText
-ay.Font=Enum.Font.GothamMedium
+ay.Font=Enum.Font.Arcade
 ay.TextSize=11
 ay.TextColor3=Color3.fromRGB(225,228,238)
 ay.TextXAlignment=Enum.TextXAlignment.Left
@@ -631,7 +732,7 @@ az.Size=UDim2.new(1,-18,0,14)
 az.Position=UDim2.new(0,10,0,24)
 az.BackgroundTransparency=1
 az.Text=av.Tab
-az.Font=Enum.Font.Gotham
+az.Font=Enum.Font.Arcade
 az.TextSize=9
 az.TextColor3=Color3.fromRGB(110,115,132)
 az.TextXAlignment=Enum.TextXAlignment.Left
@@ -654,7 +755,7 @@ local au=Instance.new"TextLabel"
 au.Size=UDim2.new(1,0,0,40)
 au.BackgroundTransparency=1
 au.Text="No settings found"
-au.Font=Enum.Font.GothamMedium
+au.Font=Enum.Font.Arcade
 au.TextSize=12
 au.TextColor3=Color3.fromRGB(110,115,132)
 au.Parent=ar
@@ -664,7 +765,7 @@ end
 local function CreateTab(as,at,au)
 local av=Instance.new"TextButton"
 av.Name=as.."Nav"
-av.Size=UDim2.new(0,38,0,38)
+av.Size=UDim2.new(0,34,0,34)
 av.BackgroundColor3=Color3.fromRGB(25,27,34)
 av.BorderSizePixel=0
 av.Text=""
@@ -680,8 +781,8 @@ local ax=Instance.new"TextLabel"
 ax.Size=UDim2.new(1,0,1,0)
 ax.BackgroundTransparency=1
 ax.Text=au or"•"
-ax.Font=Enum.Font.GothamBold
-ax.TextSize=16
+ax.Font=Enum.Font.Arcade
+ax.TextSize=14
 ax.TextColor3=Color3.fromRGB(110,115,132)
 ax.Parent=av
 
@@ -756,7 +857,7 @@ ay.Name="Title"
 ay.Size=UDim2.new(1,0,0,16)
 ay.BackgroundTransparency=1
 ay.Text=at
-ay.Font=Enum.Font.GothamBold
+ay.Font=Enum.Font.Arcade
 ay.TextSize=12
 ay.TextColor3=Color3.fromRGB(235,237,245)
 ay.TextXAlignment=Enum.TextXAlignment.Left
@@ -790,16 +891,16 @@ local az=Instance.new"TextLabel"
 az.Size=UDim2.new(0.72,0,1,0)
 az.BackgroundTransparency=1
 az.Text=at
-az.Font=Enum.Font.GothamMedium
+az.Font=Enum.Font.Arcade
 az.TextSize=11
 az.TextColor3=Color3.fromRGB(205,208,220)
 az.TextXAlignment=Enum.TextXAlignment.Left
 az.Parent=ay
 
 local aA=Instance.new"TextButton"
-aA.Size=UDim2.new(0,32,0,17)
+aA.Size=UDim2.new(0,30,0,16)
 aA.Position=UDim2.new(1,-32,0.5,-8)
-aA.BackgroundColor3=au and Color3.fromRGB(73,91,245)or Color3.fromRGB(43,45,55)
+aA.BackgroundColor3=au and CurrentTheme.Accent or CurrentTheme.Button
 aA.BorderSizePixel=0
 aA.Text=""
 aA.AutoButtonColor=false
@@ -810,7 +911,7 @@ aB.CornerRadius=UDim.new(1,0)
 aB.Parent=aA
 
 local aC=Instance.new"Frame"
-aC.Size=UDim2.new(0,11,0,11)
+aC.Size=UDim2.new(0,10,0,10)
 aC.Position=au and UDim2.new(1,-14,0.5,-5.5)or UDim2.new(0,3,0.5,-5.5)
 aC.BackgroundColor3=Color3.fromRGB(238,240,246)
 aC.BorderSizePixel=0
@@ -825,7 +926,7 @@ local aE=au
 aA.MouseButton1Click:Connect(function()
 aE=not aE
 c:Create(aA,TweenInfo.new(0.16),{
-BackgroundColor3=aE and Color3.fromRGB(73,91,245)or Color3.fromRGB(43,45,55)
+BackgroundColor3=aE and CurrentTheme.Accent or CurrentTheme.Button
 }):Play()
 c:Create(aC,TweenInfo.new(0.16),{
 Position=aE and UDim2.new(1,-14,0.5,-5.5)or UDim2.new(0,3,0.5,-5.5)
@@ -838,7 +939,7 @@ RegisterSearchItem(at,aw,ay,ax)
 return function(aF)
 aE=aF
 c:Create(aA,TweenInfo.new(0.16),{
-BackgroundColor3=aE and Color3.fromRGB(73,91,245)or Color3.fromRGB(43,45,55)
+BackgroundColor3=aE and CurrentTheme.Accent or CurrentTheme.Button
 }):Play()
 c:Create(aC,TweenInfo.new(0.16),{
 Position=aE and UDim2.new(1,-14,0.5,-5.5)or UDim2.new(0,3,0.5,-5.5)
@@ -857,7 +958,7 @@ local az=Instance.new"TextLabel"
 az.Size=UDim2.new(0.55,0,1,0)
 az.BackgroundTransparency=1
 az.Text=at
-az.Font=Enum.Font.GothamMedium
+az.Font=Enum.Font.Arcade
 az.TextSize=11
 az.TextColor3=Color3.fromRGB(205,208,220)
 az.TextXAlignment=Enum.TextXAlignment.Left
@@ -866,10 +967,10 @@ az.Parent=ay
 local aA=Instance.new"TextButton"
 aA.Size=UDim2.new(0,102,0,22)
 aA.Position=UDim2.new(1,-102,0.5,-11)
-aA.BackgroundColor3=Color3.fromRGB(37,40,51)
+aA.BackgroundColor3=CurrentTheme.Button
 aA.BorderSizePixel=0
 aA.Text=au
-aA.Font=Enum.Font.GothamMedium
+aA.Font=Enum.Font.Arcade
 aA.TextSize=10
 aA.TextColor3=Color3.fromRGB(235,237,245)
 aA.AutoButtonColor=false
@@ -880,10 +981,10 @@ aB.CornerRadius=UDim.new(0,6)
 aB.Parent=aA
 
 aA.MouseEnter:Connect(function()
-c:Create(aA,TweenInfo.new(0.12),{BackgroundColor3=Color3.fromRGB(48,52,66)}):Play()
+c:Create(aA,TweenInfo.new(0.12),{BackgroundColor3=CurrentTheme.ButtonHover}):Play()
 end)
 aA.MouseLeave:Connect(function()
-c:Create(aA,TweenInfo.new(0.12),{BackgroundColor3=Color3.fromRGB(37,40,51)}):Play()
+c:Create(aA,TweenInfo.new(0.12),{BackgroundColor3=CurrentTheme.Button}):Play()
 end)
 aA.MouseButton1Click:Connect(function()
 av(aA)
@@ -893,13 +994,13 @@ RegisterSearchItem(at,aw,ay,ax)
 return aA
 end
 
-local as,at=CreateTab("Visuals",1,"👁️")
-local au,av=CreateTab("Aimbot",2,"🎯")local
-aw, ax=CreateTab("Player Fling",3,"💫")
-local ay,az=CreateTab("Automation",4,"⚡")
-local aA,aB=CreateTab("Macro",5,"⌨️")
-local aC,aD=CreateTab("Hitbox",6,"📦")
-local aE,aF=CreateTab("Settings",7,"⚙️")
+local as,at=CreateTab("Visuals",1,"◉")
+local au,av=CreateTab("Aimbot",2,"◎")local
+aw, ax=CreateTab("Player Fling",3,"↯")
+local ay,az=CreateTab("Automation",4,"⏱")
+local aA,aB=CreateTab("Macro",5,"⌘")
+local aC,aD=CreateTab("Hitbox",6,"◇")
+local aE,aF=CreateTab("Settings",7,"⚙")
 
 ar=Instance.new"ScrollingFrame"
 ar.Name="SearchResults"
@@ -933,9 +1034,9 @@ CreateToggle(aH,"Show Health",m,function(aI)m=aI RefreshAllESP()end,"Visuals",aH
 CreateToggle(aH,"Anti-Lag",n,function(aI)n=aI RefreshAllESP()end,"Visuals",aH)
 
 local aI=CreateCard(at,"Customization","Visuals")
-CreateButton(aI,"Font",B[C].Name,function(aJ)
-C=(C%#B)+1
-aJ.Text=B[C].Name
+CreateButton(aI,"Font","Minecraft",function(aJ)
+C=4
+aJ.Text="Minecraft"
 RefreshAllESP()
 end,"Visuals",aI)
 CreateButton(aI,"Enemy Color",D[E].Name,function(aJ)
@@ -962,7 +1063,7 @@ aM.BackgroundColor3=Color3.fromRGB(30,32,44)
 aM.TextColor3=Color3.fromRGB(255,255,255)
 aM.Text=q.Name
 aM.ClearTextOnFocus=false
-aM.Font=Enum.Font.GothamMedium
+aM.Font=Enum.Font.Arcade
 aM.TextSize=10
 aM.Parent=aL.Parent
 aM.FocusLost:Connect(function()
@@ -1007,7 +1108,7 @@ aQ.Size=UDim2.new(0.65,0,1,0)
 aQ.Position=UDim2.new(0,10,0,0)
 aQ.BackgroundTransparency=1
 aQ.Text="Selected: None"
-aQ.Font=Enum.Font.GothamMedium
+aQ.Font=Enum.Font.Arcade
 aQ.TextSize=11
 aQ.TextColor3=Color3.fromRGB(180,185,205)
 aQ.TextXAlignment=Enum.TextXAlignment.Left
@@ -1016,10 +1117,10 @@ aQ.Parent=aO
 local aR=Instance.new"TextButton"
 aR.Size=UDim2.new(0,100,0,26)
 aR.Position=UDim2.new(1,-108,0.5,-13)
-aR.BackgroundColor3=Color3.fromRGB(73,91,245)
+aR.BackgroundColor3=CurrentTheme.Accent
 aR.BorderSizePixel=0
 aR.Text="START FLING"
-aR.Font=Enum.Font.GothamBold
+aR.Font=Enum.Font.Arcade
 aR.TextSize=10
 aR.TextColor3=Color3.fromRGB(255,255,255)
 aR.Parent=aO
@@ -1037,7 +1138,7 @@ for aT,aU in ipairs(a:GetPlayers())do
 if aU~=g then
 local aV=Instance.new"Frame"
 aV.Size=UDim2.new(1,0,0,32)
-aV.BackgroundColor3=(A==aU)and Color3.fromRGB(30,35,52)or Color3.fromRGB(22,23,29)
+aV.BackgroundColor3=(A==aU)and CurrentTheme.AccentSoft or CurrentTheme.Card2
 aV.BorderSizePixel=0
 aV.Parent=aM
 
@@ -1057,7 +1158,7 @@ aY.Size=UDim2.new(1,-110,1,0)
 aY.Position=UDim2.new(0,35,0,0)
 aY.BackgroundTransparency=1
 aY.Text=aU.DisplayName.." (@"..aU.Name..")"
-aY.Font=Enum.Font.GothamMedium
+aY.Font=Enum.Font.Arcade
 aY.TextSize=11
 aY.TextColor3=Color3.fromRGB(210,215,230)
 aY.TextXAlignment=Enum.TextXAlignment.Left
@@ -1066,10 +1167,10 @@ aY.Parent=aV
 local aZ=Instance.new"TextButton"
 aZ.Size=UDim2.new(0,65,0,20)
 aZ.Position=UDim2.new(1,-70,0.5,-10)
-aZ.BackgroundColor3=Color3.fromRGB(35,38,52)
+aZ.BackgroundColor3=(A==aU)and CurrentTheme.Accent or CurrentTheme.Button
 aZ.BorderSizePixel=0
 aZ.Text=(A==aU)and"Selected"or"Select"
-aZ.Font=Enum.Font.Gotham
+aZ.Font=Enum.Font.Arcade
 aZ.TextSize=10
 aZ.TextColor3=Color3.fromRGB(230,230,245)
 aZ.Parent=aV
@@ -1092,10 +1193,10 @@ if not A then return end
 z=not z
 if z then
 aR.Text="STOP FLING"
-aR.BackgroundColor3=Color3.fromRGB(220,60,60)
+aR.BackgroundColor3=CurrentTheme.RoseDanger
 else
 aR.Text="START FLING"
-aR.BackgroundColor3=Color3.fromRGB(73,91,245)
+aR.BackgroundColor3=CurrentTheme.Accent
 end
 end)
 
@@ -1106,7 +1207,7 @@ A=nil
 z=false
 aQ.Text="Selected: None"
 aR.Text="START FLING"
-aR.BackgroundColor3=Color3.fromRGB(73,91,245)
+aR.BackgroundColor3=CurrentTheme.Accent
 end
 RefreshFlingPlayerList()
 end)
@@ -1124,7 +1225,7 @@ aW.BackgroundColor3=Color3.fromRGB(30,32,44)
 aW.TextColor3=Color3.fromRGB(255,255,255)
 aW.Text=autoClickKey.Name
 aW.ClearTextOnFocus=false
-aW.Font=Enum.Font.GothamMedium
+aW.Font=Enum.Font.Arcade
 aW.TextSize=10
 aW.Parent=aV.Parent
 aW.FocusLost:Connect(function()
@@ -1134,8 +1235,8 @@ aW:Destroy()
 end)
 end,"Automation",aT)
 
-local aV=CreateCard(az,"🚀 Speed Settings","Automation")
-local aW=CreateButton(aV,"Custom Speed",tostring(M).."ms",function(aW)
+local aV=CreateCard(az,"⌁ Speed Settings","Automation")
+local aW=CreateButton(aV,"Min Speed",tostring(M).."ms",function(aW)
 local aX=Instance.new"TextBox"
 aX.Size=UDim2.new(0,100,0,25)
 aX.Position=UDim2.new(1,-100,0,0)
@@ -1143,15 +1244,36 @@ aX.BackgroundColor3=Color3.fromRGB(30,32,44)
 aX.TextColor3=Color3.fromRGB(255,255,255)
 aX.Text=tostring(M)
 aX.ClearTextOnFocus=false
-aX.Font=Enum.Font.GothamMedium
+aX.Font=Enum.Font.Arcade
 aX.TextSize=10
 aX.Parent=aW.Parent
 aX.FocusLost:Connect(function()
 local aY=tonumber(aX.Text)
 if aY then
-M=math.max(0,aY)
-N=M+10
+M=math.max(1,math.floor(aY))
+if N<M then N=M end
 aW.Text=tostring(M).."ms"
+end
+aX:Destroy()
+end)
+end,"Automation",aV)
+
+local aWMax=CreateButton(aV,"Max Speed",tostring(N).."ms",function(aW)
+local aX=Instance.new"TextBox"
+aX.Size=UDim2.new(0,100,0,25)
+aX.Position=UDim2.new(1,-100,0,0)
+aX.BackgroundColor3=Color3.fromRGB(30,32,44)
+aX.TextColor3=Color3.fromRGB(255,255,255)
+aX.Text=tostring(N)
+aX.ClearTextOnFocus=false
+aX.Font=Enum.Font.Arcade
+aX.TextSize=10
+aX.Parent=aW.Parent
+aX.FocusLost:Connect(function()
+local aY=tonumber(aX.Text)
+if aY then
+N=math.max(M,math.floor(aY))
+aW.Text=tostring(N).."ms"
 end
 aX:Destroy()
 end)
@@ -1160,11 +1282,35 @@ end,"Automation",aV)
 CreateButton(aV,"Reset to Default","25 - 35ms",function(aX)
 M=25
 N=35
+Offset=35
 if aW then aW.Text="25ms"end
+if aWMax then aWMax.Text="35ms"end
+aX.Text="25 - 35ms"
+end,"Automation",aV)
+
+CreateButton(aV,"Random Offset","35",function(aX)
+    local box=Instance.new("TextBox")
+    box.Size=UDim2.new(0,100,0,25)
+    box.Position=UDim2.new(1,-100,0,0)
+    box.BackgroundColor3=Color3.fromRGB(30,32,44)
+    box.TextColor3=Color3.fromRGB(255,255,255)
+    box.Text=tostring(Offset)
+    box.ClearTextOnFocus=false
+    box.Font=Enum.Font.Arcade
+    box.TextSize=10
+    box.Parent=aX.Parent
+    box.FocusLost:Connect(function()
+        local value=tonumber(box.Text)
+        if value then
+            Offset=math.clamp(math.floor(value),0,500)
+            aX.Text=tostring(Offset)
+        end
+        box:Destroy()
+    end)
 end,"Automation",aV)
 
 
-local aX=CreateCard(aE,"🛡️ Protection","Settings")
+local aX=CreateCard(aE,"◇ Protection","Settings")
 CreateToggle(aX,"Anti-Fling Protection",y,function(aY)y=aY end,"Settings",aX)
 
 local aY=CreateCard(aF,"⚙️ System","Settings")
@@ -1174,8 +1320,21 @@ if not aZ then r=nil z=false end
 RefreshAllESP()
 end,"Settings",aY)
 
+local aTheme=CreateCard(aE,"✦ Aesthetic","Settings")
+CreateButton(aTheme,"Theme",ThemeList[ThemeIndex].Name,function(btn)
+    btn.Text=NextTheme()
+end,"Settings",aTheme)
+CreateButton(aTheme,"Sky",SkyList[SkyIndex],function(btn)
+    btn.Text=NextSky()
+end,"Settings",aTheme)
+CreateButton(aTheme,"Sky Reset","Default",function(btn)
+    SkyIndex=1
+    ApplySkyPreset("Default")
+    btn.Text="Default"
+end,"Settings",aTheme)
 
-local aZ=CreateCard(aA,"⌨️ Macro Controls","Macro")
+
+local aZ=CreateCard(aA,"⌘ Macro Controls","Macro")
 CreateButton(aZ,"Macro Key",O.Name,function(a_)
 local a0=O.Name
 local a1=Instance.new"TextBox"
@@ -1185,7 +1344,7 @@ a1.BackgroundColor3=Color3.fromRGB(30,32,44)
 a1.TextColor3=Color3.fromRGB(255,255,255)
 a1.Text=a0
 a1.ClearTextOnFocus=false
-a1.Font=Enum.Font.GothamMedium
+a1.Font=Enum.Font.Arcade
 a1.TextSize=10
 a1.Parent=a_.Parent
 a1.FocusLost:Connect(function()
@@ -1204,7 +1363,7 @@ a1.BackgroundColor3=Color3.fromRGB(30,32,44)
 a1.TextColor3=Color3.fromRGB(255,255,255)
 a1.Text=a0
 a1.ClearTextOnFocus=false
-a1.Font=Enum.Font.GothamMedium
+a1.Font=Enum.Font.Arcade
 a1.TextSize=10
 a1.Parent=a_.Parent
 a1.FocusLost:Connect(function()
@@ -1236,7 +1395,7 @@ a1.BackgroundColor3=Color3.fromRGB(30,32,44)
 a1.TextColor3=Color3.fromRGB(255,255,255)
 a1.Text=tostring(Q)
 a1.ClearTextOnFocus=false
-a1.Font=Enum.Font.GothamMedium
+a1.Font=Enum.Font.Arcade
 a1.TextSize=10
 a1.Parent=a0.Parent
 a1.FocusLost:Connect(function()
@@ -1256,7 +1415,7 @@ a1.BackgroundTransparency=1
 a1.TextWrapped=true
 a1.TextYAlignment=Enum.TextYAlignment.Top
 a1.TextXAlignment=Enum.TextXAlignment.Left
-a1.Font=Enum.Font.Gotham
+a1.Font=Enum.Font.Arcade
 a1.TextSize=10
 a1.TextColor3=Color3.fromRGB(145,150,170)
 a1.Text='Recommended speed: 25\u{2013}35 ms\nLower values are faster but may cause more load.\n0 ms is available for custom configurations.'
@@ -1270,7 +1429,7 @@ local a3=Instance.new"TextLabel"
 a3.Size=UDim2.new(1,0,0,24)
 a3.BackgroundTransparency=1
 a3.Text="Macro Status: OFF"
-a3.Font=Enum.Font.GothamBold
+a3.Font=Enum.Font.Arcade
 a3.TextSize=11
 a3.TextColor3=Color3.fromRGB(150,155,175)
 a3.TextXAlignment=Enum.TextXAlignment.Left
@@ -1312,7 +1471,7 @@ a7.BackgroundColor3=Color3.fromRGB(30,32,44)
 a7.TextColor3=Color3.fromRGB(255,255,255)
 a7.Text=tostring(T)
 a7.ClearTextOnFocus=false
-a7.Font=Enum.Font.GothamMedium
+a7.Font=Enum.Font.Arcade
 a7.TextSize=10
 a7.Parent=a6.Parent
 a7.FocusLost:Connect(function()
@@ -1332,7 +1491,7 @@ a7.BackgroundColor3=Color3.fromRGB(30,32,44)
 a7.TextColor3=Color3.fromRGB(255,255,255)
 a7.Text=tostring(U)
 a7.ClearTextOnFocus=false
-a7.Font=Enum.Font.GothamMedium
+a7.Font=Enum.Font.Arcade
 a7.TextSize=10
 a7.Parent=a6.Parent
 a7.FocusLost:Connect(function()
@@ -1352,7 +1511,7 @@ a7.BackgroundTransparency=1
 a7.TextWrapped=true
 a7.TextYAlignment=Enum.TextYAlignment.Top
 a7.TextXAlignment=Enum.TextXAlignment.Left
-a7.Font=Enum.Font.Gotham
+a7.Font=Enum.Font.Arcade
 a7.TextSize=10
 a7.TextColor3=Color3.fromRGB(145,150,170)
 a7.Text='\u{2022} Expands target hitboxes to make shots hit easier.\n\u{2022} Recommended Size: 10 - 25 studs.\n\u{2022} Transparency: 1 = Completely Invisible, 0.5 = Semi-visible.\n\u{2022} Team Check prevents expanding teammates.'
@@ -1367,13 +1526,121 @@ local a9=Instance.new"TextLabel"
 a9.Size=UDim2.new(1,0,0,24)
 a9.BackgroundTransparency=1
 a9.Text="Hitbox Status: OFF"
-a9.Font=Enum.Font.GothamBold
+a9.Font=Enum.Font.Arcade
 a9.TextSize=11
 a9.TextColor3=Color3.fromRGB(150,155,175)
 a9.TextXAlignment=Enum.TextXAlignment.Left
 a9.Parent=a8
 
 
+ApplyTheme=function(theme)
+    CurrentTheme=theme or ThemeList[1]
+    pcall(function()
+        Y.BackgroundColor3=CurrentTheme.Panel
+        aestheticGradient.Color=ColorSequence.new({
+            ColorSequenceKeypoint.new(0,CurrentTheme.Panel),
+            ColorSequenceKeypoint.new(0.48,CurrentTheme.Card),
+            ColorSequenceKeypoint.new(1,CurrentTheme.Panel)
+        })
+        _.Color=CurrentTheme.Accent
+        headerAccent.BackgroundColor3=CurrentTheme.Accent
+        ab.BackgroundColor3=CurrentTheme.Card2
+        ai.BackgroundColor3=CurrentTheme.Panel
+        af.TextColor3=CurrentTheme.Accent
+        af2.TextColor3=CurrentTheme.Muted
+        ad.TextColor3=CurrentTheme.Muted
+        ae.TextColor3=CurrentTheme.Text
+        ae.PlaceholderColor3=CurrentTheme.Muted
+        ag.BackgroundColor3=CurrentTheme.Card2
+        ag.TextColor3=CurrentTheme.Text
+
+        for _,obj in ipairs(Y:GetDescendants()) do
+            if obj:IsA("TextLabel") then
+                if obj.Name=="Title" then
+                    obj.TextColor3=CurrentTheme.Text
+                elseif obj.Text=="No settings found" or obj.Text=="aesthetic control panel" then
+                    obj.TextColor3=CurrentTheme.Muted
+                else
+                    obj.TextColor3=CurrentTheme.Text
+                end
+                obj.Font=Enum.Font.Arcade
+
+            elseif obj:IsA("TextBox") then
+                obj.TextColor3=CurrentTheme.Text
+                obj.PlaceholderColor3=CurrentTheme.Muted
+                obj.Font=Enum.Font.Arcade
+
+            elseif obj:IsA("TextButton") then
+                obj.Font=Enum.Font.Arcade
+
+                if string.match(obj.Name,"Nav$") then
+                    obj.BackgroundColor3=CurrentTheme.Card2
+
+                elseif obj.Text=="ON" then
+                    obj.BackgroundColor3=CurrentTheme.Accent
+
+                elseif obj.Text=="OFF" then
+                    obj.BackgroundColor3=CurrentTheme.Button
+
+                elseif obj.Text=="START FLING" or obj.Text=="Selected" or obj.Text=="Set" then
+                    obj.BackgroundColor3=CurrentTheme.Accent
+                    obj.TextColor3=CurrentTheme.Text
+
+                elseif obj.Text=="STOP FLING" then
+                    obj.BackgroundColor3=CurrentTheme.RoseDanger
+                    obj.TextColor3=CurrentTheme.Text
+
+                elseif obj.Text=="Select" then
+                    obj.BackgroundColor3=CurrentTheme.Button
+                    obj.TextColor3=CurrentTheme.Text
+
+                elseif obj.Parent and string.find(obj.Parent.Name,"Setting_") then
+                    -- Toggle buttons have no text. Read the knob position to preserve ON/OFF state.
+                    local knob=obj:FindFirstChildOfClass("Frame")
+                    if knob then
+                        obj.BackgroundColor3=(knob.Position.X.Scale > 0.5) and CurrentTheme.Accent or CurrentTheme.Button
+                    else
+                        obj.BackgroundColor3=CurrentTheme.Button
+                    end
+                    obj.TextColor3=CurrentTheme.Text
+                elseif obj.Parent and obj.Parent.Name=="SearchResults" then
+                    obj.BackgroundColor3=CurrentTheme.Card2
+                    obj.TextColor3=CurrentTheme.Text
+                end
+
+            elseif obj:IsA("Frame") and string.sub(obj.Name,1,5)=="Card_" then
+                obj.BackgroundColor3=CurrentTheme.Card
+
+            elseif obj:IsA("ScrollingFrame") then
+                obj.ScrollBarImageColor3=CurrentTheme.Accent
+
+            elseif obj:IsA("UIStroke") then
+                if obj.Parent==Y then
+                    obj.Color=CurrentTheme.Accent
+                end
+            end
+        end
+
+        if aq then
+            SetTab(aq)
+        end
+    end)
+end
+
+NextTheme=function()
+    ThemeIndex=(ThemeIndex%#ThemeList)+1
+    ApplyTheme(ThemeList[ThemeIndex])
+    return ThemeList[ThemeIndex].Name
+end
+
+NextSky=function()
+    SkyIndex=(SkyIndex%#SkyList)+1
+    ApplySkyPreset(SkyList[SkyIndex])
+    return SkyList[SkyIndex]
+end
+
+ApplyTheme(ThemeList[ThemeIndex])
+ApplySkyPreset(SkyList[SkyIndex])
 SetTab"Visuals"
 
 
