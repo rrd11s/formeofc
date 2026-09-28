@@ -1,0 +1,1467 @@
+_G.FriendColor=Color3.fromRGB(0,125,255)
+_G.EnemyColor=Color3.fromRGB(255,255,255)
+
+if _G.ESP_Loaded then return end
+_G.ESP_Loaded=true
+
+local a=game:GetService"Players"
+local b=game:GetService"UserInputService"
+local c=game:GetService"TweenService"
+local d=game:GetService"RunService"
+local e=game:GetService"Stats"
+local f=game:GetService"VirtualInputManager"
+local g=a.LocalPlayer
+local h=g:GetMouse()
+local i=workspace.CurrentCamera
+
+local j={"none","none"}
+
+local function IsBannedUser(k)
+for l,m in ipairs(j)do
+if string.lower(k.Name)==string.lower(m)or string.lower(k.DisplayName)==string.lower(m)then
+return true
+end
+end
+return false
+end
+
+if IsBannedUser(g)then
+g:Kick"Banned"
+return
+end
+
+local k=true
+local l=true
+local m=true
+local n=false
+
+local o=true
+local p=false
+local q=Enum.KeyCode.Q
+local autoClickKey=Enum.KeyCode.E
+local r
+
+local s="HumanoidRootPart"
+local t=false
+local u=0.3
+local v=false
+
+local w=false
+local x=true
+
+local y=false
+local z=false
+local A
+
+local B={
+{Name="Gotham Medium",Font=Enum.Font.GothamMedium},
+{Name="Gotham Bold",Font=Enum.Font.GothamBold},
+{Name="Source Sans",Font=Enum.Font.SourceSansBold},
+{Name="Arcade",Font=Enum.Font.Arcade},
+{Name="Code",Font=Enum.Font.Code}
+}
+local C=1
+
+local D={
+{Name="White",Color=Color3.fromRGB(255,255,255)},
+{Name="Red",Color=Color3.fromRGB(255,60,60)},
+{Name="Green",Color=Color3.fromRGB(60,255,120)},
+{Name="Cyan",Color=Color3.fromRGB(0,220,255)},
+{Name="Blue",Color=Color3.fromRGB(80,110,255)}
+}
+local E=1
+
+local F=0
+local G=0
+
+local H=g:WaitForChild("PlayerGui",10)
+local I=game:GetService"CoreGui"
+
+local J=Instance.new"Folder"
+J.Name="ESP_Holder"
+J.Parent=I
+
+local function GetPlayerHealth(K)
+if not K or not K.Character then return 100,100 end
+local L=K.Character
+local M=L:FindFirstChildOfClass"Humanoid"
+
+local N=L:GetAttribute"Health"or L:GetAttribute"HP"
+local O=L:GetAttribute"MaxHealth"or L:GetAttribute"MaxHP"or 100
+if N then return math.floor(N),math.floor(O)end
+
+local P=L:FindFirstChild"Health"or L:FindFirstChild"HP"
+local Q=L:FindFirstChild"MaxHealth"or L:FindFirstChild"MaxHP"
+if P and(P:IsA"NumberValue"or P:IsA"IntValue")then
+local R=(Q and(Q:IsA"NumberValue"or Q:IsA"IntValue"))and Q.Value or 100
+return math.floor(P.Value),math.floor(R)
+end
+
+if M then return math.floor(M.Health),math.floor(M.MaxHealth)end
+return 100,100
+end
+
+local K=Instance.new"ScreenGui"
+K.Name="VerolixStats"
+K.ResetOnSpawn=false
+K.DisplayOrder=999999
+K.ZIndexBehavior=Enum.ZIndexBehavior.Global
+K.Parent=I
+
+local L=Instance.new"TextLabel"
+L.Size=UDim2.new(0,320,0,24)
+L.Position=UDim2.new(0,16,0,12)
+L.BackgroundTransparency=1
+L.Font=Enum.Font.GothamBold
+L.TextSize=12
+L.TextColor3=Color3.fromRGB(220,225,240)
+L.TextXAlignment=Enum.TextXAlignment.Left
+L.Text="FPS: -- | Ping: -- ms | Auto: OFF"
+L.Parent=K
+
+d.RenderStepped:Connect(function(M)
+F=math.floor(1/M)
+if k then
+L.Text="FPS: "..F.." | Ping: "..G.." ms | Auto: "..(w and"ON"or"OFF")
+L.Visible=true
+else
+L.Visible=false
+end
+end)
+
+task.spawn(function()
+while task.wait(1)do
+pcall(function()
+G=math.floor(e.Network.ServerStatsItem["Data Ping"]:GetValue())
+end)
+end
+end)
+
+task.spawn(function()
+while true do
+if k and w then
+pcall(function()
+if mouse1click then
+mouse1click()
+else
+f:SendMouseButtonEvent(h.X,h.Y,0,true,game,1)
+task.wait(0.005)
+f:SendMouseButtonEvent(h.X,h.Y,0,false,game,1)
+end
+end)
+local M=0.025
+if x then
+M=math.max(0.005,M+(math.random(-35,35)/1000))
+end
+task.wait(M)
+else
+task.wait(0.1)
+end
+end
+end)
+
+d.Stepped:Connect(function()
+if k and y and g.Character then
+for M,N in ipairs(a:GetPlayers())do
+if N~=g and N.Character then
+for O,P in ipairs(N.Character:GetChildren())do
+if P:IsA"BasePart"then P.CanCollide=false end
+end
+end
+end
+local M=g.Character:FindFirstChild"HumanoidRootPart"
+if M then
+if M.AssemblyLinearVelocity.Magnitude>250 then M.AssemblyLinearVelocity=Vector3.new(0,0,0)end
+if M.AssemblyAngularVelocity.Magnitude>250 then M.AssemblyAngularVelocity=Vector3.new(0,0,0)end
+end
+end
+end)
+
+d.Heartbeat:Connect(function()
+if k and z and A and A.Character and g.Character then
+local M=g.Character:FindFirstChild"HumanoidRootPart"
+local N=A.Character:FindFirstChild"HumanoidRootPart"
+if M and N then
+M.AssemblyAngularVelocity=Vector3.new(999999,999999,999999)
+M.CFrame=N.CFrame*CFrame.new(0,0,0)
+end
+end
+end)
+
+local function GetPlayerColor(M)
+local N=false
+pcall(function()N=g:IsFriendsWith(M.UserId)end)
+return N and _G.FriendColor or _G.EnemyColor
+end
+
+local function GetClosestTarget()
+local M
+local N=1000
+local O=Vector2.new(h.X,h.Y)
+
+for P,Q in ipairs(a:GetPlayers())do
+if Q~=g and Q.Character and Q.Character:FindFirstChild"HumanoidRootPart"then local
+R=GetPlayerHealth(Q)
+if R>0 then
+local S=false
+pcall(function()S=g:IsFriendsWith(Q.UserId)end)
+if not S or p then
+local T=Q.Character.HumanoidRootPart
+local U,V=i:WorldToViewportPoint(T.Position)
+if V then
+local W=(Vector2.new(U.X,U.Y)-O).Magnitude
+if W<N then
+N=W
+M=Q
+end
+end
+end
+end
+end
+end
+return M
+end
+
+local function UpdateTargetESP(M)
+local N=J:FindFirstChild(M.Name.."_ESP")
+if not N then return end
+
+local O=N:FindFirstChild"Glow"
+local P=N:FindFirstChild"NameTag"
+local Q=P and P:FindFirstChildOfClass"TextLabel"
+
+local R=k and l
+local S=GetPlayerColor(M)
+
+if O then
+O.Enabled=R
+O.FillColor=S
+O.OutlineColor=S
+O.FillTransparency=n and 0.85 or 0.5
+O.OutlineTransparency=n and 1 or 0
+end
+
+if P then P.Enabled=R end
+
+if Q and M.Character then local
+T=GetPlayerHealth(M)
+Q.TextColor3=S
+Q.Font=B[C].Font
+Q.Text=m and(M.DisplayName.." (@"..M.Name..") | "..T.." HP")or(M.DisplayName.." (@"..M.Name..")")
+end
+end
+
+local function RefreshAllESP()
+for M,N in ipairs(J:GetChildren())do
+local O=string.sub(N.Name,1,#N.Name-4)
+local P=a:FindFirstChild(O)
+if P then UpdateTargetESP(P)end
+end
+end
+
+local function LoadCharacter(M,N)
+if M==g or not N then return end
+
+local O=N:FindFirstChild"Head"
+local P=N:FindFirstChildOfClass"Humanoid"
+local Q=0
+while(not O or not P)and Q<10 do
+task.wait(0.3)
+O=N:FindFirstChild"Head"
+P=N:FindFirstChildOfClass"Humanoid"
+Q=Q+0.3
+end
+if not O or not P then return end
+
+local R=GetPlayerColor(M)
+
+local S=J:FindFirstChild(M.Name.."_ESP")
+if S then S:Destroy()end
+
+local T=Instance.new"Folder"
+T.Name=M.Name.."_ESP"
+T.Parent=J
+
+local U=Instance.new"Highlight"
+U.Name="Glow"
+U.Adornee=N
+U.FillColor=R
+U.OutlineColor=R
+U.FillTransparency=n and 0.85 or 0.5
+U.OutlineTransparency=n and 1 or 0
+U.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop
+U.Enabled=k and l
+U.Parent=T
+
+local V=Instance.new"BillboardGui"
+V.Name="NameTag"
+V.Size=UDim2.new(0,160,0,35)
+V.AlwaysOnTop=true
+V.StudsOffset=Vector3.new(0,2.5,0)
+V.Adornee=O
+V.Enabled=k and l
+
+local W=Instance.new"TextLabel"
+W.BackgroundTransparency=1
+W.Size=UDim2.new(1,0,1,0)
+W.TextSize=12
+W.Font=B[C].Font
+W.TextColor3=R
+W.TextStrokeTransparency=0.2
+W.TextStrokeColor3=Color3.fromRGB(0,0,0)
+W.Parent=V
+
+V.Parent=T
+
+UpdateTargetESP(M)
+
+P.HealthChanged:Connect(function()
+if m then UpdateTargetESP(M)end
+end)
+end
+
+local function LoadPlayer(M)
+if M==g then return end
+if M.Character then task.spawn(LoadCharacter,M,M.Character)end
+M.CharacterAdded:Connect(function(N)task.spawn(LoadCharacter,M,N)end)
+end
+
+for M,N in ipairs(a:GetPlayers())do LoadPlayer(N)end
+a.PlayerAdded:Connect(LoadPlayer)
+a.PlayerRemoving:Connect(function(M)
+local N=J:FindFirstChild(M.Name.."_ESP")
+if N then N:Destroy()end
+end)
+
+d.RenderStepped:Connect(function()
+if k and o and r and r.Character then
+local M=r.Character:FindFirstChild(s)or r.Character:FindFirstChild"HumanoidRootPart"local
+N=GetPlayerHealth(r)
+if M and N>0 then
+local O=M.Position
+if v then
+O=O+(M.AssemblyLinearVelocity*0.12)
+end
+local P=CFrame.new(i.CFrame.Position,O)
+if t then
+i.CFrame=i.CFrame:Lerp(P,u)
+else
+i.CFrame=P
+end
+else
+r=nil
+end
+else
+r=nil
+end
+end)
+
+
+
+local M=25
+local N=35
+
+local O=Enum.KeyCode.F
+local P=Enum.KeyCode.Zero
+local Q=25
+local R=false
+
+local S=false
+local T=10
+local U=0.7
+local V="HumanoidRootPart"
+local W=true
+
+local function KeyCodeFromText(X,Y)
+local Z
+pcall(function()
+Z=Enum.KeyCode[string.upper(X)]
+end)
+if Z then
+return Z
+end
+return Y
+end
+
+
+
+
+local X=Instance.new"ScreenGui"
+X.Name="SleekDashboardMenu"
+X.ResetOnSpawn=false
+X.IgnoreGuiInset=true
+X.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
+X.DisplayOrder=999999999
+X.Parent=H
+
+local Y=Instance.new"Frame"
+Y.Name="MainFrame"
+Y.Size=UDim2.new(0,720,0,500)
+Y.Position=UDim2.new(0.5,-360,0.5,-250)
+Y.BackgroundColor3=Color3.fromRGB(16,17,22)
+Y.BorderSizePixel=0
+Y.Visible=false
+Y.Active=true
+Y.Draggable=true
+Y.Parent=X
+
+local Z=Instance.new"UICorner"
+Z.CornerRadius=UDim.new(0,12)
+Z.Parent=Y
+
+-- Keep the menu alive without breaking its child ZIndex hierarchy.
+local function ProtectDashboard()
+    pcall(function()
+        if X.Parent~=H then X.Parent=H end
+        X.Enabled=true
+        X.DisplayOrder=999999999
+        X.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
+        if K.Parent~=I then K.Parent=I end
+        K.Enabled=true
+        K.DisplayOrder=999999
+        K.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
+    end)
+end
+
+X.AncestryChanged:Connect(function()
+    task.defer(ProtectDashboard)
+end)
+K.AncestryChanged:Connect(function()
+    task.defer(ProtectDashboard)
+end)
+
+task.spawn(function()
+    while task.wait(1) do
+        ProtectDashboard()
+    end
+end)
+
+local _=Instance.new"UIStroke"
+_.Color=Color3.fromRGB(34,36,45)
+_.Transparency=0.25
+_.Thickness=1
+_.Parent=Y
+
+local aa=Instance.new"Frame"
+aa.Size=UDim2.new(1,0,0,62)
+aa.BackgroundTransparency=1
+aa.Parent=Y
+
+local ab=Instance.new"Frame"
+ab.Name="SearchFrame"
+ab.Size=UDim2.new(0,300,0,34)
+ab.Position=UDim2.new(0,54,0,14)
+ab.BackgroundColor3=Color3.fromRGB(25,27,34)
+ab.BorderSizePixel=0
+ab.Parent=aa
+
+local ac=Instance.new"UICorner"
+ac.CornerRadius=UDim.new(0,9)
+ac.Parent=ab
+
+local ad=Instance.new"TextLabel"
+ad.Size=UDim2.new(0,28,1,0)
+ad.BackgroundTransparency=1
+ad.Text="⌕"
+ad.Font=Enum.Font.GothamMedium
+ad.TextSize=20
+ad.TextColor3=Color3.fromRGB(115,120,135)
+ad.Parent=ab
+
+local ae=Instance.new"TextBox"
+ae.Name="SearchBox"
+ae.Size=UDim2.new(1,-36,1,0)
+ae.Position=UDim2.new(0,32,0,0)
+ae.BackgroundTransparency=1
+ae.ClearTextOnFocus=false
+ae.PlaceholderText="Search in this tab.."
+ae.PlaceholderColor3=Color3.fromRGB(100,104,118)
+ae.Text=""
+ae.TextColor3=Color3.fromRGB(225,228,238)
+ae.TextSize=12
+ae.Font=Enum.Font.Gotham
+ae.TextXAlignment=Enum.TextXAlignment.Left
+ae.Parent=ab
+
+local af=Instance.new"TextLabel"
+af.Size=UDim2.new(0,120,0,24)
+af.Position=UDim2.new(0,12,0,4)
+af.BackgroundTransparency=1
+af.Text="Script"
+af.Font=Enum.Font.GothamBold
+af.TextSize=13
+af.TextColor3=Color3.fromRGB(235,237,245)
+af.TextXAlignment=Enum.TextXAlignment.Left
+af.Parent=aa
+
+local ag=Instance.new"TextButton"
+ag.Size=UDim2.new(0,34,0,34)
+ag.Position=UDim2.new(1,-48,0,14)
+ag.BackgroundColor3=Color3.fromRGB(28,30,38)
+ag.BorderSizePixel=0
+ag.Text="▪▪\n▪▪"
+ag.TextSize=9
+ag.TextColor3=Color3.fromRGB(215,218,230)
+ag.Font=Enum.Font.GothamBold
+ag.Parent=aa
+
+local ah=Instance.new"UICorner"
+ah.CornerRadius=UDim.new(0,9)
+ah.Parent=ag
+
+local ai=Instance.new"Frame"
+ai.Size=UDim2.new(0,48,1,-76)
+ai.Position=UDim2.new(0,10,0,66)
+ai.BackgroundColor3=Color3.fromRGB(19,20,26)
+ai.BorderSizePixel=0
+ai.Parent=Y
+
+local aj=Instance.new"UICorner"
+aj.CornerRadius=UDim.new(0,10)
+aj.Parent=ai
+
+local ak=Instance.new"UIListLayout"
+ak.SortOrder=Enum.SortOrder.LayoutOrder
+ak.Padding=UDim.new(0,7)
+ak.HorizontalAlignment=Enum.HorizontalAlignment.Center
+ak.Parent=ai
+
+local al=Instance.new"UIPadding"
+al.PaddingTop=UDim.new(0,8)
+al.Parent=ai
+
+local am=Instance.new"Frame"
+am.Size=UDim2.new(1,-72,1,-76)
+am.Position=UDim2.new(0,68,0,66)
+am.BackgroundTransparency=1
+am.Parent=Y
+
+local an={}
+local ao={}
+local ap={}
+local aq
+local ar
+
+local function RegisterSearchItem(as,at,au,av)
+local aw={
+Text=string.lower(tostring(as)),
+DisplayText=tostring(as),
+Tab=at,
+Frame=au,
+Card=av
+}
+table.insert(ap,aw)
+return aw
+end
+
+local function SetTab(as)
+aq=as
+for at,au in pairs(an)do
+local av=at==as
+au.Frame.Visible=av and ae.Text==""
+local aw=ao[at]
+if aw then
+c:Create(aw.Btn,TweenInfo.new(0.16),{
+BackgroundColor3=av and Color3.fromRGB(43,48,67)or Color3.fromRGB(25,27,34),
+TextColor3=av and Color3.fromRGB(255,255,255)or Color3.fromRGB(110,115,132)
+}):Play()
+c:Create(aw.Icon,TweenInfo.new(0.16),{
+TextColor3=av and Color3.fromRGB(255,255,255)or Color3.fromRGB(110,115,132)
+}):Play()
+end
+end
+end
+
+local function ClearSearchResults()
+if not ar then return end
+for as,at in ipairs(ar:GetChildren())do
+if at:IsA"GuiObject"then
+at:Destroy()
+end
+end
+end
+
+local function RunSearch(as)
+as=string.lower(as or"")
+ClearSearchResults()
+
+if as==""then
+if ar then ar.Visible=false end
+if aq and an[aq]then
+an[aq].Frame.Visible=true
+end
+return
+end
+
+for at,au in pairs(an)do
+au.Frame.Visible=false
+end
+if not ar then return end
+ar.Visible=true
+
+local at=0
+for au,av in ipairs(ap)do
+if string.find(av.Text,as,1,true)or string.find(string.lower(av.Tab),as,1,true)then
+at+=1
+local aw=Instance.new"TextButton"
+aw.Size=UDim2.new(1,-4,0,42)
+aw.BackgroundColor3=Color3.fromRGB(25,27,34)
+aw.BorderSizePixel=0
+aw.Text=""
+aw.AutoButtonColor=false
+aw.Parent=ar
+
+local ax=Instance.new"UICorner"
+ax.CornerRadius=UDim.new(0,8)
+ax.Parent=aw
+
+local ay=Instance.new"TextLabel"
+ay.Size=UDim2.new(1,-18,0,19)
+ay.Position=UDim2.new(0,10,0,5)
+ay.BackgroundTransparency=1
+ay.Text=av.DisplayText
+ay.Font=Enum.Font.GothamMedium
+ay.TextSize=11
+ay.TextColor3=Color3.fromRGB(225,228,238)
+ay.TextXAlignment=Enum.TextXAlignment.Left
+ay.Parent=aw
+
+local az=Instance.new"TextLabel"
+az.Size=UDim2.new(1,-18,0,14)
+az.Position=UDim2.new(0,10,0,24)
+az.BackgroundTransparency=1
+az.Text=av.Tab
+az.Font=Enum.Font.Gotham
+az.TextSize=9
+az.TextColor3=Color3.fromRGB(110,115,132)
+az.TextXAlignment=Enum.TextXAlignment.Left
+az.Parent=aw
+
+aw.MouseButton1Click:Connect(function()
+ae.Text=""
+SetTab(av.Tab)
+task.defer(function()
+if av.Frame and av.Frame.Parent then
+
+end
+end)
+end)
+end
+end
+
+if at==0 then
+local au=Instance.new"TextLabel"
+au.Size=UDim2.new(1,0,0,40)
+au.BackgroundTransparency=1
+au.Text="No settings found"
+au.Font=Enum.Font.GothamMedium
+au.TextSize=12
+au.TextColor3=Color3.fromRGB(110,115,132)
+au.Parent=ar
+end
+end
+
+local function CreateTab(as,at,au)
+local av=Instance.new"TextButton"
+av.Name=as.."Nav"
+av.Size=UDim2.new(0,38,0,38)
+av.BackgroundColor3=Color3.fromRGB(25,27,34)
+av.BorderSizePixel=0
+av.Text=""
+av.AutoButtonColor=false
+av.LayoutOrder=at
+av.Parent=ai
+
+local aw=Instance.new"UICorner"
+aw.CornerRadius=UDim.new(0,9)
+aw.Parent=av
+
+local ax=Instance.new"TextLabel"
+ax.Size=UDim2.new(1,0,1,0)
+ax.BackgroundTransparency=1
+ax.Text=au or"•"
+ax.Font=Enum.Font.GothamBold
+ax.TextSize=16
+ax.TextColor3=Color3.fromRGB(110,115,132)
+ax.Parent=av
+
+local ay=Instance.new"ScrollingFrame"
+ay.Name=as.."Tab"
+ay.Size=UDim2.new(1,0,1,0)
+ay.BackgroundTransparency=1
+ay.BorderSizePixel=0
+ay.ScrollBarThickness=2
+ay.ScrollBarImageColor3=Color3.fromRGB(58,62,82)
+ay.Visible=false
+ay.AutomaticCanvasSize=Enum.AutomaticSize.Y
+ay.CanvasSize=UDim2.new(0,0,0,0)
+ay.Parent=am
+
+local az=Instance.new"Frame"
+az.Name="LeftColumn"
+az.Size=UDim2.new(0.49,-5,1,0)
+az.BackgroundTransparency=1
+az.Parent=ay
+
+local aA=Instance.new"UIListLayout"
+aA.SortOrder=Enum.SortOrder.LayoutOrder
+aA.Padding=UDim.new(0,10)
+aA.Parent=az
+
+local aB=Instance.new"Frame"
+aB.Name="RightColumn"
+aB.Size=UDim2.new(0.49,-5,1,0)
+aB.Position=UDim2.new(0.51,0,0,0)
+aB.BackgroundTransparency=1
+aB.Parent=ay
+
+local aC=Instance.new"UIListLayout"
+aC.SortOrder=Enum.SortOrder.LayoutOrder
+aC.Padding=UDim.new(0,10)
+aC.Parent=aB
+
+an[as]={Frame=ay,Left=az,Right=aB}
+ao[as]={Btn=av,Icon=ax}
+
+av.MouseButton1Click:Connect(function()
+ae.Text=""
+SetTab(as)
+end)
+
+return az,aB,ay
+end
+
+local function CreateCard(as,at,au)
+local av=Instance.new"Frame"
+av.Name="Card_"..string.gsub(at,"%s+","_")
+av.Size=UDim2.new(1,0,0,0)
+av.AutomaticSize=Enum.AutomaticSize.Y
+av.BackgroundColor3=Color3.fromRGB(24,25,31)
+av.BorderSizePixel=0
+av.Parent=as
+
+local aw=Instance.new"UICorner"
+aw.CornerRadius=UDim.new(0,9)
+aw.Parent=av
+
+local ax=Instance.new"UIPadding"
+ax.PaddingTop=UDim.new(0,12)
+ax.PaddingBottom=UDim.new(0,12)
+ax.PaddingLeft=UDim.new(0,12)
+ax.PaddingRight=UDim.new(0,12)
+ax.Parent=av
+
+local ay=Instance.new"TextLabel"
+ay.Name="Title"
+ay.Size=UDim2.new(1,0,0,16)
+ay.BackgroundTransparency=1
+ay.Text=at
+ay.Font=Enum.Font.GothamBold
+ay.TextSize=12
+ay.TextColor3=Color3.fromRGB(235,237,245)
+ay.TextXAlignment=Enum.TextXAlignment.Left
+ay.Parent=av
+
+local az=Instance.new"Frame"
+az.Name="Container"
+az.Size=UDim2.new(1,0,0,0)
+az.Position=UDim2.new(0,0,0,23)
+az.AutomaticSize=Enum.AutomaticSize.Y
+az.BackgroundTransparency=1
+az.Parent=av
+
+local aA=Instance.new"UIListLayout"
+aA.SortOrder=Enum.SortOrder.LayoutOrder
+aA.Padding=UDim.new(0,8)
+aA.Parent=az
+
+RegisterSearchItem(at,au,av,av)
+return az,av
+end
+
+local function CreateToggle(as,at,au,av,aw,ax)
+local ay=Instance.new"Frame"
+ay.Name="Setting_"..string.gsub(at,"%s+","_")
+ay.Size=UDim2.new(1,0,0,28)
+ay.BackgroundTransparency=1
+ay.Parent=as
+
+local az=Instance.new"TextLabel"
+az.Size=UDim2.new(0.72,0,1,0)
+az.BackgroundTransparency=1
+az.Text=at
+az.Font=Enum.Font.GothamMedium
+az.TextSize=11
+az.TextColor3=Color3.fromRGB(205,208,220)
+az.TextXAlignment=Enum.TextXAlignment.Left
+az.Parent=ay
+
+local aA=Instance.new"TextButton"
+aA.Size=UDim2.new(0,32,0,17)
+aA.Position=UDim2.new(1,-32,0.5,-8)
+aA.BackgroundColor3=au and Color3.fromRGB(73,91,245)or Color3.fromRGB(43,45,55)
+aA.BorderSizePixel=0
+aA.Text=""
+aA.AutoButtonColor=false
+aA.Parent=ay
+
+local aB=Instance.new"UICorner"
+aB.CornerRadius=UDim.new(1,0)
+aB.Parent=aA
+
+local aC=Instance.new"Frame"
+aC.Size=UDim2.new(0,11,0,11)
+aC.Position=au and UDim2.new(1,-14,0.5,-5.5)or UDim2.new(0,3,0.5,-5.5)
+aC.BackgroundColor3=Color3.fromRGB(238,240,246)
+aC.BorderSizePixel=0
+aC.Parent=aA
+
+local aD=Instance.new"UICorner"
+aD.CornerRadius=UDim.new(1,0)
+aD.Parent=aC
+
+local aE=au
+
+aA.MouseButton1Click:Connect(function()
+aE=not aE
+c:Create(aA,TweenInfo.new(0.16),{
+BackgroundColor3=aE and Color3.fromRGB(73,91,245)or Color3.fromRGB(43,45,55)
+}):Play()
+c:Create(aC,TweenInfo.new(0.16),{
+Position=aE and UDim2.new(1,-14,0.5,-5.5)or UDim2.new(0,3,0.5,-5.5)
+}):Play()
+av(aE)
+end)
+
+RegisterSearchItem(at,aw,ay,ax)
+
+return function(aF)
+aE=aF
+c:Create(aA,TweenInfo.new(0.16),{
+BackgroundColor3=aE and Color3.fromRGB(73,91,245)or Color3.fromRGB(43,45,55)
+}):Play()
+c:Create(aC,TweenInfo.new(0.16),{
+Position=aE and UDim2.new(1,-14,0.5,-5.5)or UDim2.new(0,3,0.5,-5.5)
+}):Play()
+end
+end
+
+local function CreateButton(as,at,au,av,aw,ax)
+local ay=Instance.new"Frame"
+ay.Name="Setting_"..string.gsub(at,"%s+","_")
+ay.Size=UDim2.new(1,0,0,28)
+ay.BackgroundTransparency=1
+ay.Parent=as
+
+local az=Instance.new"TextLabel"
+az.Size=UDim2.new(0.55,0,1,0)
+az.BackgroundTransparency=1
+az.Text=at
+az.Font=Enum.Font.GothamMedium
+az.TextSize=11
+az.TextColor3=Color3.fromRGB(205,208,220)
+az.TextXAlignment=Enum.TextXAlignment.Left
+az.Parent=ay
+
+local aA=Instance.new"TextButton"
+aA.Size=UDim2.new(0,102,0,22)
+aA.Position=UDim2.new(1,-102,0.5,-11)
+aA.BackgroundColor3=Color3.fromRGB(37,40,51)
+aA.BorderSizePixel=0
+aA.Text=au
+aA.Font=Enum.Font.GothamMedium
+aA.TextSize=10
+aA.TextColor3=Color3.fromRGB(235,237,245)
+aA.AutoButtonColor=false
+aA.Parent=ay
+
+local aB=Instance.new"UICorner"
+aB.CornerRadius=UDim.new(0,6)
+aB.Parent=aA
+
+aA.MouseEnter:Connect(function()
+c:Create(aA,TweenInfo.new(0.12),{BackgroundColor3=Color3.fromRGB(48,52,66)}):Play()
+end)
+aA.MouseLeave:Connect(function()
+c:Create(aA,TweenInfo.new(0.12),{BackgroundColor3=Color3.fromRGB(37,40,51)}):Play()
+end)
+aA.MouseButton1Click:Connect(function()
+av(aA)
+end)
+
+RegisterSearchItem(at,aw,ay,ax)
+return aA
+end
+
+local as,at=CreateTab("Visuals",1,"👁️")
+local au,av=CreateTab("Aimbot",2,"🎯")local
+aw, ax=CreateTab("Player Fling",3,"💫")
+local ay,az=CreateTab("Automation",4,"⚡")
+local aA,aB=CreateTab("Macro",5,"⌨️")
+local aC,aD=CreateTab("Hitbox",6,"📦")
+local aE,aF=CreateTab("Settings",7,"⚙️")
+
+ar=Instance.new"ScrollingFrame"
+ar.Name="SearchResults"
+ar.Size=UDim2.new(1,0,1,0)
+ar.BackgroundTransparency=1
+ar.BorderSizePixel=0
+ar.ScrollBarThickness=2
+ar.ScrollBarImageColor3=Color3.fromRGB(58,62,82)
+ar.AutomaticCanvasSize=Enum.AutomaticSize.Y
+ar.CanvasSize=UDim2.new(0,0,0,0)
+ar.Visible=false
+ar.Parent=am
+
+local aG=Instance.new"UIListLayout"
+aG.SortOrder=Enum.SortOrder.LayoutOrder
+aG.Padding=UDim.new(0,7)
+aG.Parent=ar
+
+ae:GetPropertyChangedSignal"Text":Connect(function()
+RunSearch(ae.Text)
+end)
+
+ag.MouseButton1Click:Connect(function()
+Y.Visible=not Y.Visible
+end)
+
+
+local aH=CreateCard(as,"👁️ ESP","Visuals")
+CreateToggle(aH,"Enabled",l,function(aI)l=aI RefreshAllESP()end,"Visuals",aH)
+CreateToggle(aH,"Show Health",m,function(aI)m=aI RefreshAllESP()end,"Visuals",aH)
+CreateToggle(aH,"Anti-Lag",n,function(aI)n=aI RefreshAllESP()end,"Visuals",aH)
+
+local aI=CreateCard(at,"Customization","Visuals")
+CreateButton(aI,"Font",B[C].Name,function(aJ)
+C=(C%#B)+1
+aJ.Text=B[C].Name
+RefreshAllESP()
+end,"Visuals",aI)
+CreateButton(aI,"Enemy Color",D[E].Name,function(aJ)
+E=(E%#D)+1
+_G.EnemyColor=D[E].Color
+aJ.Text=D[E].Name
+RefreshAllESP()
+end,"Visuals",aI)
+
+
+local aJ=CreateCard(au,"🎯 Aim","Aimbot")
+CreateToggle(aJ,"Aim Assist",o,function(aK)o=aK if not aK then r=nil end end,"Aimbot",aJ)
+CreateToggle(aJ,"Exclude Friends",not p,function(aK)p=not aK end,"Aimbot",aJ)
+CreateToggle(aJ,"Target Head",s=="Head",function(aK)s=aK and"Head"or"HumanoidRootPart"end,"Aimbot",aJ)
+
+local aK=CreateCard(av,"⚙️ Behavior","Aimbot")
+CreateToggle(aK,"Smoothness",t,function(aL)t=aL end,"Aimbot",aK)
+CreateToggle(aK,"Prediction",v,function(aL)v=aL end,"Aimbot",aK)
+CreateButton(aK,"Aim Assist Key",q.Name,function(aL)
+local aM=Instance.new"TextBox"
+aM.Size=UDim2.new(0,100,0,25)
+aM.Position=UDim2.new(1,-100,0,0)
+aM.BackgroundColor3=Color3.fromRGB(30,32,44)
+aM.TextColor3=Color3.fromRGB(255,255,255)
+aM.Text=q.Name
+aM.ClearTextOnFocus=false
+aM.Font=Enum.Font.GothamMedium
+aM.TextSize=10
+aM.Parent=aL.Parent
+aM.FocusLost:Connect(function()
+q=KeyCodeFromText(aM.Text,q)
+aL.Text=q.Name
+aM:Destroy()
+end)
+end,"Aimbot",aK)
+
+
+aw.Size=UDim2.new(1,0,1,0)
+ax.Visible=false
+local aL=CreateCard(aw,"💫 Select Target Player","Player Fling")
+
+local aM=Instance.new"ScrollingFrame"
+aM.Size=UDim2.new(1,0,0,210)
+aM.BackgroundTransparency=1
+aM.BorderSizePixel=0
+aM.ScrollBarThickness=2
+aM.ScrollBarImageColor3=Color3.fromRGB(58,62,82)
+aM.AutomaticCanvasSize=Enum.AutomaticSize.Y
+aM.CanvasSize=UDim2.new(0,0,0,0)
+aM.Parent=aL
+
+local aN=Instance.new"UIListLayout"
+aN.SortOrder=Enum.SortOrder.LayoutOrder
+aN.Padding=UDim.new(0,4)
+aN.Parent=aM
+
+local aO=Instance.new"Frame"
+aO.Size=UDim2.new(1,0,0,42)
+aO.BackgroundColor3=Color3.fromRGB(30,32,40)
+aO.BorderSizePixel=0
+aO.Parent=aL
+
+local aP=Instance.new"UICorner"
+aP.CornerRadius=UDim.new(0,7)
+aP.Parent=aO
+
+local aQ=Instance.new"TextLabel"
+aQ.Size=UDim2.new(0.65,0,1,0)
+aQ.Position=UDim2.new(0,10,0,0)
+aQ.BackgroundTransparency=1
+aQ.Text="Selected: None"
+aQ.Font=Enum.Font.GothamMedium
+aQ.TextSize=11
+aQ.TextColor3=Color3.fromRGB(180,185,205)
+aQ.TextXAlignment=Enum.TextXAlignment.Left
+aQ.Parent=aO
+
+local aR=Instance.new"TextButton"
+aR.Size=UDim2.new(0,100,0,26)
+aR.Position=UDim2.new(1,-108,0.5,-13)
+aR.BackgroundColor3=Color3.fromRGB(73,91,245)
+aR.BorderSizePixel=0
+aR.Text="START FLING"
+aR.Font=Enum.Font.GothamBold
+aR.TextSize=10
+aR.TextColor3=Color3.fromRGB(255,255,255)
+aR.Parent=aO
+
+local aS=Instance.new"UICorner"
+aS.CornerRadius=UDim.new(0,6)
+aS.Parent=aR
+
+local function RefreshFlingPlayerList()
+for aT,aU in ipairs(aM:GetChildren())do
+if aU:IsA"Frame"then aU:Destroy()end
+end
+
+for aT,aU in ipairs(a:GetPlayers())do
+if aU~=g then
+local aV=Instance.new"Frame"
+aV.Size=UDim2.new(1,0,0,32)
+aV.BackgroundColor3=(A==aU)and Color3.fromRGB(30,35,52)or Color3.fromRGB(22,23,29)
+aV.BorderSizePixel=0
+aV.Parent=aM
+
+local aW=Instance.new"UICorner"
+aW.CornerRadius=UDim.new(0,5)
+aW.Parent=aV
+
+local aX=Instance.new"ImageLabel"
+aX.Size=UDim2.new(0,24,0,24)
+aX.Position=UDim2.new(0,5,0.5,-12)
+aX.BackgroundTransparency=1
+aX.Image="rbxthumb://type=AvatarHeadShot&id="..aU.UserId.."&w=48&h=48"
+aX.Parent=aV
+
+local aY=Instance.new"TextLabel"
+aY.Size=UDim2.new(1,-110,1,0)
+aY.Position=UDim2.new(0,35,0,0)
+aY.BackgroundTransparency=1
+aY.Text=aU.DisplayName.." (@"..aU.Name..")"
+aY.Font=Enum.Font.GothamMedium
+aY.TextSize=11
+aY.TextColor3=Color3.fromRGB(210,215,230)
+aY.TextXAlignment=Enum.TextXAlignment.Left
+aY.Parent=aV
+
+local aZ=Instance.new"TextButton"
+aZ.Size=UDim2.new(0,65,0,20)
+aZ.Position=UDim2.new(1,-70,0.5,-10)
+aZ.BackgroundColor3=Color3.fromRGB(35,38,52)
+aZ.BorderSizePixel=0
+aZ.Text=(A==aU)and"Selected"or"Select"
+aZ.Font=Enum.Font.Gotham
+aZ.TextSize=10
+aZ.TextColor3=Color3.fromRGB(230,230,245)
+aZ.Parent=aV
+
+local a_=Instance.new"UICorner"
+a_.CornerRadius=UDim.new(0,4)
+a_.Parent=aZ
+
+aZ.MouseButton1Click:Connect(function()
+A=aU
+aQ.Text="Selected: "..aU.DisplayName
+RefreshFlingPlayerList()
+end)
+end
+end
+end
+
+aR.MouseButton1Click:Connect(function()
+if not A then return end
+z=not z
+if z then
+aR.Text="STOP FLING"
+aR.BackgroundColor3=Color3.fromRGB(220,60,60)
+else
+aR.Text="START FLING"
+aR.BackgroundColor3=Color3.fromRGB(73,91,245)
+end
+end)
+
+a.PlayerAdded:Connect(RefreshFlingPlayerList)
+a.PlayerRemoving:Connect(function(aT)
+if A==aT then
+A=nil
+z=false
+aQ.Text="Selected: None"
+aR.Text="START FLING"
+aR.BackgroundColor3=Color3.fromRGB(73,91,245)
+end
+RefreshFlingPlayerList()
+end)
+RefreshFlingPlayerList()
+
+
+local aT=CreateCard(ay,"⚡ Automation","Automation")
+local aU=CreateToggle(aT,"Auto Clicker",w,function(aU)w=aU end,"Automation",aT)
+CreateToggle(aT,"Random Offset",x,function(aV)x=aV end,"Automation",aT)
+CreateButton(aT,"Auto Clicker Key",autoClickKey.Name,function(aV)
+local aW=Instance.new"TextBox"
+aW.Size=UDim2.new(0,100,0,25)
+aW.Position=UDim2.new(1,-100,0,0)
+aW.BackgroundColor3=Color3.fromRGB(30,32,44)
+aW.TextColor3=Color3.fromRGB(255,255,255)
+aW.Text=autoClickKey.Name
+aW.ClearTextOnFocus=false
+aW.Font=Enum.Font.GothamMedium
+aW.TextSize=10
+aW.Parent=aV.Parent
+aW.FocusLost:Connect(function()
+autoClickKey=KeyCodeFromText(aW.Text,autoClickKey)
+aV.Text=autoClickKey.Name
+aW:Destroy()
+end)
+end,"Automation",aT)
+
+local aV=CreateCard(az,"🚀 Speed Settings","Automation")
+local aW=CreateButton(aV,"Custom Speed",tostring(M).."ms",function(aW)
+local aX=Instance.new"TextBox"
+aX.Size=UDim2.new(0,100,0,25)
+aX.Position=UDim2.new(1,-100,0,0)
+aX.BackgroundColor3=Color3.fromRGB(30,32,44)
+aX.TextColor3=Color3.fromRGB(255,255,255)
+aX.Text=tostring(M)
+aX.ClearTextOnFocus=false
+aX.Font=Enum.Font.GothamMedium
+aX.TextSize=10
+aX.Parent=aW.Parent
+aX.FocusLost:Connect(function()
+local aY=tonumber(aX.Text)
+if aY then
+M=math.max(0,aY)
+N=M+10
+aW.Text=tostring(M).."ms"
+end
+aX:Destroy()
+end)
+end,"Automation",aV)
+
+CreateButton(aV,"Reset to Default","25 - 35ms",function(aX)
+M=25
+N=35
+if aW then aW.Text="25ms"end
+end,"Automation",aV)
+
+
+local aX=CreateCard(aE,"🛡️ Protection","Settings")
+CreateToggle(aX,"Anti-Fling Protection",y,function(aY)y=aY end,"Settings",aX)
+
+local aY=CreateCard(aF,"⚙️ System","Settings")
+CreateToggle(aY,"Master Switch",k,function(aZ)
+k=aZ
+if not aZ then r=nil z=false end
+RefreshAllESP()
+end,"Settings",aY)
+
+
+local aZ=CreateCard(aA,"⌨️ Macro Controls","Macro")
+CreateButton(aZ,"Macro Key",O.Name,function(a_)
+local a0=O.Name
+local a1=Instance.new"TextBox"
+a1.Size=UDim2.new(0,100,0,25)
+a1.Position=UDim2.new(1,-100,0,0)
+a1.BackgroundColor3=Color3.fromRGB(30,32,44)
+a1.TextColor3=Color3.fromRGB(255,255,255)
+a1.Text=a0
+a1.ClearTextOnFocus=false
+a1.Font=Enum.Font.GothamMedium
+a1.TextSize=10
+a1.Parent=a_.Parent
+a1.FocusLost:Connect(function()
+O=KeyCodeFromText(a1.Text,O)
+a_.Text=O.Name
+a1:Destroy()
+end)
+end,"Macro",aZ)
+
+CreateButton(aZ,"Toggle Key",P.Name,function(a_)
+local a0=P.Name
+local a1=Instance.new"TextBox"
+a1.Size=UDim2.new(0,100,0,25)
+a1.Position=UDim2.new(1,-100,0,0)
+a1.BackgroundColor3=Color3.fromRGB(30,32,44)
+a1.TextColor3=Color3.fromRGB(255,255,255)
+a1.Text=a0
+a1.ClearTextOnFocus=false
+a1.Font=Enum.Font.GothamMedium
+a1.TextSize=10
+a1.Parent=a_.Parent
+a1.FocusLost:Connect(function()
+P=KeyCodeFromText(a1.Text,P)
+a_.Text=P.Name
+a1:Destroy()
+end)
+end,"Macro",aZ)
+
+local a_=CreateCard(aB,"Macro Speed","Macro")
+CreateButton(a_,"Speed","25 ms",function(a0)
+Q=Q+5
+if Q>100 then Q=0 end
+a0.Text=tostring(Q).." ms"
+end,"Macro",a_)
+CreateButton(a_,"Recommended","25–35 ms",function(a0)
+Q=25
+a0.Text="25 ms"
+end,"Macro",a_)
+CreateButton(a_,"Fast Mode","35 ms",function(a0)
+Q=35
+a0.Text="35 ms"
+end,"Macro",a_)
+CreateButton(a_,"Custom Speed","Set",function(a0)
+local a1=Instance.new"TextBox"
+a1.Size=UDim2.new(0,100,0,25)
+a1.Position=UDim2.new(1,-100,0,0)
+a1.BackgroundColor3=Color3.fromRGB(30,32,44)
+a1.TextColor3=Color3.fromRGB(255,255,255)
+a1.Text=tostring(Q)
+a1.ClearTextOnFocus=false
+a1.Font=Enum.Font.GothamMedium
+a1.TextSize=10
+a1.Parent=a0.Parent
+a1.FocusLost:Connect(function()
+local a2=tonumber(a1.Text)
+if a2 then
+Q=math.max(0,a2)
+a0.Text=tostring(Q).." ms"
+end
+a1:Destroy()
+end)
+end,"Macro",a_)
+
+local a0=CreateCard(aB,"ℹ️ Information","Macro")
+local a1=Instance.new"TextLabel"
+a1.Size=UDim2.new(1,0,0,70)
+a1.BackgroundTransparency=1
+a1.TextWrapped=true
+a1.TextYAlignment=Enum.TextYAlignment.Top
+a1.TextXAlignment=Enum.TextXAlignment.Left
+a1.Font=Enum.Font.Gotham
+a1.TextSize=10
+a1.TextColor3=Color3.fromRGB(145,150,170)
+a1.Text='Recommended speed: 25\u{2013}35 ms\nLower values are faster but may cause more load.\n0 ms is available for custom configurations.'
+
+
+
+a1.Parent=a0
+
+local a2=CreateCard(aA,"Status","Macro")
+local a3=Instance.new"TextLabel"
+a3.Size=UDim2.new(1,0,0,24)
+a3.BackgroundTransparency=1
+a3.Text="Macro Status: OFF"
+a3.Font=Enum.Font.GothamBold
+a3.TextSize=11
+a3.TextColor3=Color3.fromRGB(150,155,175)
+a3.TextXAlignment=Enum.TextXAlignment.Left
+a3.Parent=a2
+
+
+local a4=CreateCard(aC,"📦 Hitbox Controls","Hitbox")
+CreateButton(a4,"Hitbox Expander","OFF",function(a5)
+S=not S
+a5.Text=S and"ON"or"OFF"
+if statusHitboxLabel then
+statusHitboxLabel.Text="Hitbox Status: "..(S and"ON"or"OFF")
+statusHitboxLabel.TextColor3=S and Color3.fromRGB(80,220,120)or Color3.fromRGB(150,155,175)
+end
+end,"Hitbox",a4)
+CreateButton(a4,"Target Part",V,function(a5)
+if V=="HumanoidRootPart"then
+V="Head"
+else
+V="HumanoidRootPart"
+end
+a5.Text=V
+end,"Hitbox",a4)
+CreateButton(a4,"Team Check","ON",function(a5)
+W=not W
+a5.Text=W and"ON"or"OFF"
+end,"Hitbox",a4)
+
+local a5=CreateCard(aD,"🎨 Hitbox Size & Visuals","Hitbox")
+CreateButton(a5,"Default Size","10 studs",function(a6)
+T=10
+a6.Text="10 studs"
+end,"Hitbox",a5)
+CreateButton(a5,"Custom Size","Set Size",function(a6)
+local a7=Instance.new"TextBox"
+a7.Size=UDim2.new(0,100,0,25)
+a7.Position=UDim2.new(1,-100,0,0)
+a7.BackgroundColor3=Color3.fromRGB(30,32,44)
+a7.TextColor3=Color3.fromRGB(255,255,255)
+a7.Text=tostring(T)
+a7.ClearTextOnFocus=false
+a7.Font=Enum.Font.GothamMedium
+a7.TextSize=10
+a7.Parent=a6.Parent
+a7.FocusLost:Connect(function()
+local a8=tonumber(a7.Text)
+if a8 then
+T=math.clamp(a8,2,100)
+a6.Text=tostring(T).." studs"
+end
+a7:Destroy()
+end)
+end,"Hitbox",a5)
+CreateButton(a5,"Transparency",tostring(U),function(a6)
+local a7=Instance.new"TextBox"
+a7.Size=UDim2.new(0,100,0,25)
+a7.Position=UDim2.new(1,-100,0,0)
+a7.BackgroundColor3=Color3.fromRGB(30,32,44)
+a7.TextColor3=Color3.fromRGB(255,255,255)
+a7.Text=tostring(U)
+a7.ClearTextOnFocus=false
+a7.Font=Enum.Font.GothamMedium
+a7.TextSize=10
+a7.Parent=a6.Parent
+a7.FocusLost:Connect(function()
+local a8=tonumber(a7.Text)
+if a8 then
+U=math.clamp(a8,0,1)
+a6.Text=tostring(U)
+end
+a7:Destroy()
+end)
+end,"Hitbox",a5)
+
+local a6=CreateCard(aD,"ℹ️ Information","Hitbox")
+local a7=Instance.new"TextLabel"
+a7.Size=UDim2.new(1,0,0,70)
+a7.BackgroundTransparency=1
+a7.TextWrapped=true
+a7.TextYAlignment=Enum.TextYAlignment.Top
+a7.TextXAlignment=Enum.TextXAlignment.Left
+a7.Font=Enum.Font.Gotham
+a7.TextSize=10
+a7.TextColor3=Color3.fromRGB(145,150,170)
+a7.Text='\u{2022} Expands target hitboxes to make shots hit easier.\n\u{2022} Recommended Size: 10 - 25 studs.\n\u{2022} Transparency: 1 = Completely Invisible, 0.5 = Semi-visible.\n\u{2022} Team Check prevents expanding teammates.'
+
+
+
+
+a7.Parent=a6
+
+local a8=CreateCard(aC,"📊 Status","Hitbox")
+local a9=Instance.new"TextLabel"
+a9.Size=UDim2.new(1,0,0,24)
+a9.BackgroundTransparency=1
+a9.Text="Hitbox Status: OFF"
+a9.Font=Enum.Font.GothamBold
+a9.TextSize=11
+a9.TextColor3=Color3.fromRGB(150,155,175)
+a9.TextXAlignment=Enum.TextXAlignment.Left
+a9.Parent=a8
+
+
+SetTab"Visuals"
+
+
+b.InputBegan:Connect(function(ba,bb)
+if ba.KeyCode==Enum.KeyCode.LeftControl or ba.KeyCode==Enum.KeyCode.RightControl then
+Y.Visible=not Y.Visible
+return
+end
+if bb then return end
+
+if ba.KeyCode==autoClickKey then
+w=not w
+aU(w)
+elseif ba.KeyCode==q then
+if not k or not o then return end
+if r then
+r=nil
+else
+r=GetClosestTarget()
+end
+end
+end)
+
+b.InputBegan:Connect(function(ba,bb)
+if bb then return end
+if ba.KeyCode==P then
+R=not R
+a3.Text="Macro Status: "..(R and"ON"or"OFF")
+a3.TextColor3=R
+and Color3.fromRGB(80,220,120)
+or Color3.fromRGB(150,155,175)
+end
+end)
+
+task.spawn(function()
+while true do
+if R and k then
+pcall(function()
+f:SendKeyEvent(true,O,false,game)
+task.wait(0.001)
+f:SendKeyEvent(false,O,false,game)
+end)
+task.wait(math.max(0,Q)/1000)
+else
+task.wait(0.1)
+end
+end
+end)
+
+task.spawn(function()
+while true do
+task.wait(0.1)
+
+
+local ba=(typeof(k)=="boolean")and k or true
+
+pcall(function()
+for bb,bc in ipairs(a:GetPlayers())do
+if bc~=g and bc.Character then
+local bd=bc.Character
+local be=bd:FindFirstChild(V)
+local bf=bd:FindFirstChildOfClass"Humanoid"
+
+if be and bf and bf.Health>0 then
+
+local bg=true
+if W and g.Team and bc.Team then
+if bc.Team==g.Team then
+bg=false
+end
+end
+if S and ba and bg then
+be.Size=Vector3.new(T,T,T)
+be.Transparency=U
+be.CanCollide=false
+else
+
+if V=="HumanoidRootPart"then
+be.Size=Vector3.new(2,2,1)
+be.Transparency=1
+elseif V=="Head"then
+be.Size=Vector3.new(2,1,1)
+be.Transparency=0
+end
+end
+end
+end
+end
+end)
+end
+end)
