@@ -54,13 +54,21 @@ local z=false
 local A
 
 local B={
-{Name="Gotham Medium",Font=Enum.Font.Arcade},
-{Name="Gotham Bold",Font=Enum.Font.Arcade},
-{Name="Source Sans",Font=Enum.Font.Arcade},
+{Name="Gotham",Font=Enum.Font.Gotham},
+{Name="Gotham Bold",Font=Enum.Font.GothamBold},
+{Name="Source Sans",Font=Enum.Font.SourceSans},
 {Name="Arcade",Font=Enum.Font.Arcade},
 {Name="Code",Font=Enum.Font.Code}
 }
 local C=4
+local MenuFontIndex=1
+local MenuFont=B[MenuFontIndex].Font
+
+
+local MENU_BACKGROUND_ASSET="rbxassetid://105379764802325"
+local MENU_ICON_ASSET="rbxassetid://123348461534241"
+local CORNER_ICON_ASSET="rbxassetid://106210904672464"
+local MOD_GROUP_ID=16393463
 
 local D={
 {Name="White",Color=Color3.fromRGB(255,255,255)},
@@ -329,6 +337,7 @@ W.Parent=V
 
 V.Parent=T
 
+
 UpdateTargetESP(M)
 
 P.HealthChanged:Connect(function()
@@ -379,17 +388,14 @@ local P=Enum.KeyCode.Zero
 local Q=25
 local R=false
 
--- UI theme / sky presets
+
 local ThemeIndex=1
 local SkyIndex=1
+
 local ThemeList={
-    {Name="Aesthetic",Accent=Color3.fromRGB(242,120,255),AccentSoft=Color3.fromRGB(95,45,120),Card=Color3.fromRGB(42,24,52),Panel=Color3.fromRGB(15,9,24),Card2=Color3.fromRGB(31,20,40),Button=Color3.fromRGB(50,28,63),ButtonHover=Color3.fromRGB(70,38,88),Text=Color3.fromRGB(255,245,255),Muted=Color3.fromRGB(172,145,184),OnDot=Color3.fromRGB(255,255,255),RoseDanger=Color3.fromRGB(255,82,110)},
-    {Name="Lavender",Accent=Color3.fromRGB(201,148,255),AccentSoft=Color3.fromRGB(83,59,116),Card=Color3.fromRGB(37,27,50),Panel=Color3.fromRGB(16,11,25),Card2=Color3.fromRGB(29,22,40),Button=Color3.fromRGB(47,33,62),ButtonHover=Color3.fromRGB(67,46,86),Text=Color3.fromRGB(249,243,255),Muted=Color3.fromRGB(163,147,181),OnDot=Color3.fromRGB(255,255,255),RoseDanger=Color3.fromRGB(255,82,110)},
-    {Name="Rose",Accent=Color3.fromRGB(255,119,181),AccentSoft=Color3.fromRGB(104,46,72),Card=Color3.fromRGB(49,25,38),Panel=Color3.fromRGB(25,10,18),Card2=Color3.fromRGB(38,19,30),Button=Color3.fromRGB(61,28,44),ButtonHover=Color3.fromRGB(82,36,58),Text=Color3.fromRGB(255,243,249),Muted=Color3.fromRGB(185,146,163),OnDot=Color3.fromRGB(255,255,255),RoseDanger=Color3.fromRGB(255,82,110)},
-    {Name="Mint",Accent=Color3.fromRGB(106,235,199),AccentSoft=Color3.fromRGB(39,87,76),Card=Color3.fromRGB(24,43,40),Panel=Color3.fromRGB(9,21,19),Card2=Color3.fromRGB(19,34,32),Button=Color3.fromRGB(30,58,53),ButtonHover=Color3.fromRGB(40,78,70),Text=Color3.fromRGB(240,255,250),Muted=Color3.fromRGB(139,179,169),OnDot=Color3.fromRGB(255,255,255),RoseDanger=Color3.fromRGB(255,82,110)},
-    {Name="Ocean",Accent=Color3.fromRGB(102,196,255),AccentSoft=Color3.fromRGB(38,77,110),Card=Color3.fromRGB(23,34,48),Panel=Color3.fromRGB(8,17,27),Card2=Color3.fromRGB(18,27,39),Button=Color3.fromRGB(28,48,66),ButtonHover=Color3.fromRGB(38,65,86),Text=Color3.fromRGB(239,250,255),Muted=Color3.fromRGB(139,169,185),OnDot=Color3.fromRGB(255,255,255),RoseDanger=Color3.fromRGB(255,82,110)}
+    {Name="AETE Dark",Accent=Color3.fromRGB(126,176,255),AccentSoft=Color3.fromRGB(53,76,112),Card=Color3.fromRGB(30,32,39),Panel=Color3.fromRGB(14,15,19),Card2=Color3.fromRGB(23,25,31),Button=Color3.fromRGB(39,42,51),ButtonHover=Color3.fromRGB(53,58,70),Text=Color3.fromRGB(242,244,249),Muted=Color3.fromRGB(145,151,165),OnDot=Color3.fromRGB(255,255,255),RoseDanger=Color3.fromRGB(255,82,110)}
 }
-local SkyList={"Default","Soft Night","Aurora","Sunset","Cloudy"}
+local SkyList={"Default","Soft Night","Aurora","Sunset","Cloudy","Midnight","Purple Space","Blue Haze","Warm Dusk"}
 
 local function ApplySkyPreset(name)
     pcall(function()
@@ -434,6 +440,34 @@ local function ApplySkyPreset(name)
             sky.SkyboxLf="rbxassetid://271042310"
             sky.SkyboxRt="rbxassetid://271042467"
             sky.SkyboxUp="rbxassetid://271077958"
+        elseif name=="Midnight" then
+            sky.SkyboxBk="rbxassetid://159454293"
+            sky.SkyboxDn="rbxassetid://159454296"
+            sky.SkyboxFt="rbxassetid://159454299"
+            sky.SkyboxLf="rbxassetid://159454300"
+            sky.SkyboxRt="rbxassetid://159454288"
+            sky.SkyboxUp="rbxassetid://159454286"
+        elseif name=="Purple Space" then
+            sky.SkyboxBk="rbxassetid://12064107"
+            sky.SkyboxDn="rbxassetid://12064152"
+            sky.SkyboxFt="rbxassetid://12064121"
+            sky.SkyboxLf="rbxassetid://12064115"
+            sky.SkyboxRt="rbxassetid://12064131"
+            sky.SkyboxUp="rbxassetid://12064125"
+        elseif name=="Blue Haze" then
+            sky.SkyboxBk="rbxassetid://628970688"
+            sky.SkyboxDn="rbxassetid://628970717"
+            sky.SkyboxFt="rbxassetid://628970625"
+            sky.SkyboxLf="rbxassetid://628970515"
+            sky.SkyboxRt="rbxassetid://628970588"
+            sky.SkyboxUp="rbxassetid://628970667"
+        elseif name=="Warm Dusk" then
+            sky.SkyboxBk="rbxassetid://15006208"
+            sky.SkyboxDn="rbxassetid://15006224"
+            sky.SkyboxFt="rbxassetid://15006214"
+            sky.SkyboxLf="rbxassetid://15006207"
+            sky.SkyboxRt="rbxassetid://15006209"
+            sky.SkyboxUp="rbxassetid://15006215"
         end
     end)
 end
@@ -473,26 +507,57 @@ X.Parent=H
 
 local Y=Instance.new"Frame"
 Y.Name="MainFrame"
-Y.Size=UDim2.new(0,650,0,440)
-Y.Position=UDim2.new(0.5,-325,0.5,-220)
-Y.BackgroundColor3=Color3.fromRGB(15,9,24)
+Y.Size=UDim2.new(0,700,0,450)
+Y.Position=UDim2.new(0.5,-350,0.5,-225)
+Y.BackgroundColor3=Color3.fromRGB(15,16,20)
 Y.BorderSizePixel=0
 local aestheticGradient=Instance.new("UIGradient")
 aestheticGradient.Rotation=135
-aestheticGradient.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(15,9,24)),ColorSequenceKeypoint.new(0.55,Color3.fromRGB(42,24,52)),ColorSequenceKeypoint.new(1,Color3.fromRGB(10,6,18))})
+aestheticGradient.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(20,22,28)),ColorSequenceKeypoint.new(0.55,Color3.fromRGB(28,31,38)),ColorSequenceKeypoint.new(1,Color3.fromRGB(14,16,20))})
 aestheticGradient.Parent=Y
 Y.Visible=false
 Y.Active=true
 Y.Draggable=true
 Y.Parent=X
-Y:SetAttribute("Theme","Aesthetic")
-Y:SetAttribute("MenuName","4JK")
+
+local menuBackground=Instance.new("ImageLabel")
+menuBackground.Name="MenuBackground"
+menuBackground.Size=UDim2.new(1,0,1,0)
+menuBackground.Position=UDim2.new(0,0,0,0)
+menuBackground.BackgroundTransparency=1
+menuBackground.Image=MENU_BACKGROUND_ASSET
+menuBackground.ImageTransparency=0.35
+menuBackground.ScaleType=Enum.ScaleType.Stretch
+menuBackground.ZIndex=1
+menuBackground.Parent=Y
+
+local menuTint=Instance.new("Frame")
+menuTint.Name="MenuBackgroundTint"
+menuTint.Size=UDim2.new(1,0,1,0)
+menuTint.BackgroundColor3=Color3.fromRGB(10,12,16)
+menuTint.BackgroundTransparency=0.18
+menuTint.BorderSizePixel=0
+menuTint.ZIndex=1
+menuTint.Parent=Y
+
+task.spawn(function()
+    task.wait(2)
+    pcall(function()
+        if not menuBackground.IsLoaded then
+            menuBackground.Visible=false
+            menuTint.BackgroundTransparency=0
+        end
+    end)
+end)
+
+Y:SetAttribute("Theme","AETE Dark")
+Y:SetAttribute("MenuName","Eta")
 
 local Z=Instance.new"UICorner"
 Z.CornerRadius=UDim.new(0,12)
 Z.Parent=Y
 
--- Keep the menu alive without breaking its child ZIndex hierarchy.
+
 local function ProtectDashboard()
     pcall(function()
         if X.Parent~=H then X.Parent=H end
@@ -525,9 +590,20 @@ _.Transparency=0.25
 _.Thickness=1
 _.Parent=Y
 
+local cornerIcon=Instance.new("ImageLabel")
+cornerIcon.Name="CornerIcon"
+cornerIcon.Size=UDim2.new(0,34,0,34)
+cornerIcon.Position=UDim2.new(1,-44,1,-44)
+cornerIcon.BackgroundTransparency=1
+cornerIcon.Image=CORNER_ICON_ASSET
+cornerIcon.ImageTransparency=0.05
+cornerIcon.ZIndex=4
+cornerIcon.Parent=Y
+
 local aa=Instance.new"Frame"
 aa.Size=UDim2.new(1,0,0,62)
 aa.BackgroundTransparency=1
+aa.ZIndex=3
 aa.Parent=Y
 
 local headerAccent=Instance.new("Frame")
@@ -539,8 +615,8 @@ headerAccent.Parent=aa
 
 local ab=Instance.new"Frame"
 ab.Name="SearchFrame"
-ab.Size=UDim2.new(0,250,0,30)
-ab.Position=UDim2.new(0,50,0,12)
+ab.Size=UDim2.new(0,220,0,28)
+ab.Position=UDim2.new(0,190,0,13)
 ab.BackgroundColor3=Color3.fromRGB(25,27,34)
 ab.BorderSizePixel=0
 ab.Parent=aa
@@ -550,18 +626,18 @@ ac.CornerRadius=UDim.new(0,9)
 ac.Parent=ab
 
 local ad=Instance.new"TextLabel"
-ad.Size=UDim2.new(0,28,1,0)
+ad.Size=UDim2.new(0,52,1,0)
 ad.BackgroundTransparency=1
-ad.Text="⌕"
+ad.Text="SEARCH"
 ad.Font=Enum.Font.Arcade
-ad.TextSize=20
+ad.TextSize=8
 ad.TextColor3=Color3.fromRGB(115,120,135)
 ad.Parent=ab
 
 local ae=Instance.new"TextBox"
 ae.Name="SearchBox"
 ae.Size=UDim2.new(1,-36,1,0)
-ae.Position=UDim2.new(0,32,0,0)
+ae.Position=UDim2.new(0,48,0,0)
 ae.BackgroundTransparency=1
 ae.ClearTextOnFocus=false
 ae.PlaceholderText="Search settings..."
@@ -573,26 +649,37 @@ ae.Font=Enum.Font.Arcade
 ae.TextXAlignment=Enum.TextXAlignment.Left
 ae.Parent=ab
 
+local menuIcon=Instance.new("ImageLabel")
+menuIcon.Name="MenuIcon"
+menuIcon.Size=UDim2.new(0,32,0,32)
+menuIcon.Position=UDim2.new(0,10,0,13)
+menuIcon.BackgroundTransparency=1
+menuIcon.Image=MENU_ICON_ASSET
+menuIcon.ZIndex=4
+menuIcon.Parent=aa
+
 local af=Instance.new"TextLabel"
-af.Size=UDim2.new(0,120,0,24)
-af.Position=UDim2.new(0,12,0,4)
+af.Size=UDim2.new(0,180,0,24)
+af.Position=UDim2.new(0,48,0,4)
 af.BackgroundTransparency=1
-af.Text="4JK"
+af.Text="Eta"
 af.Font=Enum.Font.Arcade
 af.TextSize=13
 af.TextColor3=Color3.fromRGB(235,237,245)
 af.TextXAlignment=Enum.TextXAlignment.Left
+af.ZIndex=4
 af.Parent=aa
 
 local af2=Instance.new"TextLabel"
 af2.Size=UDim2.new(0,180,0,16)
-af2.Position=UDim2.new(0,12,0,24)
+af2.Position=UDim2.new(0,48,0,24)
 af2.BackgroundTransparency=1
-af2.Text="aesthetic control panel"
+af2.Text="visual control panel"
 af2.Font=Enum.Font.Arcade
 af2.TextSize=9
 af2.TextColor3=Color3.fromRGB(105,110,125)
 af2.TextXAlignment=Enum.TextXAlignment.Left
+af2.ZIndex=4
 af2.Parent=aa
 
 local ag=Instance.new"TextButton"
@@ -600,10 +687,11 @@ ag.Size=UDim2.new(0,30,0,30)
 ag.Position=UDim2.new(1,-42,0,12)
 ag.BackgroundColor3=Color3.fromRGB(28,30,38)
 ag.BorderSizePixel=0
-ag.Text="≡"
+ag.Text="MENU"
 ag.TextSize=9
 ag.TextColor3=Color3.fromRGB(215,218,230)
 ag.Font=Enum.Font.Arcade
+ag.ZIndex=4
 ag.Parent=aa
 
 local ah=Instance.new"UICorner"
@@ -611,10 +699,11 @@ ah.CornerRadius=UDim.new(0,9)
 ah.Parent=ag
 
 local ai=Instance.new"Frame"
-ai.Size=UDim2.new(0,44,1,-66)
-ai.Position=UDim2.new(0,8,0,58)
+ai.Size=UDim2.new(0,150,1,-66)
+ai.Position=UDim2.new(0,10,0,66)
 ai.BackgroundColor3=Color3.fromRGB(19,20,26)
 ai.BorderSizePixel=0
+ai.ZIndex=2
 ai.Parent=Y
 
 local aj=Instance.new"UICorner"
@@ -624,7 +713,7 @@ aj.Parent=ai
 local ak=Instance.new"UIListLayout"
 ak.SortOrder=Enum.SortOrder.LayoutOrder
 ak.Padding=UDim.new(0,7)
-ak.HorizontalAlignment=Enum.HorizontalAlignment.Center
+ak.HorizontalAlignment=Enum.HorizontalAlignment.Left
 ak.Parent=ai
 
 local al=Instance.new"UIPadding"
@@ -632,9 +721,10 @@ al.PaddingTop=UDim.new(0,8)
 al.Parent=ai
 
 local am=Instance.new"Frame"
-am.Size=UDim2.new(1,-62,1,-66)
-am.Position=UDim2.new(0,60,0,58)
+am.Size=UDim2.new(1,-174,1,-78)
+am.Position=UDim2.new(0,166,0,66)
 am.BackgroundTransparency=1
+am.ZIndex=2
 am.Parent=Y
 
 local an={}
@@ -765,7 +855,7 @@ end
 local function CreateTab(as,at,au)
 local av=Instance.new"TextButton"
 av.Name=as.."Nav"
-av.Size=UDim2.new(0,34,0,34)
+av.Size=UDim2.new(1,-12,0,38)
 av.BackgroundColor3=Color3.fromRGB(25,27,34)
 av.BorderSizePixel=0
 av.Text=""
@@ -778,12 +868,14 @@ aw.CornerRadius=UDim.new(0,9)
 aw.Parent=av
 
 local ax=Instance.new"TextLabel"
-ax.Size=UDim2.new(1,0,1,0)
+ax.Size=UDim2.new(1,-20,1,0)
 ax.BackgroundTransparency=1
-ax.Text=au or"•"
+ax.Text=au or"-"
 ax.Font=Enum.Font.Arcade
-ax.TextSize=14
+ax.TextSize=9
 ax.TextColor3=Color3.fromRGB(110,115,132)
+ax.TextXAlignment=Enum.TextXAlignment.Left
+ax.Position=UDim2.new(0,12,0,0)
 ax.Parent=av
 
 local ay=Instance.new"ScrollingFrame"
@@ -994,13 +1086,13 @@ RegisterSearchItem(at,aw,ay,ax)
 return aA
 end
 
-local as,at=CreateTab("Visuals",1,"◉")
-local au,av=CreateTab("Aimbot",2,"◎")local
-aw, ax=CreateTab("Player Fling",3,"↯")
-local ay,az=CreateTab("Automation",4,"⏱")
-local aA,aB=CreateTab("Macro",5,"⌘")
-local aC,aD=CreateTab("Hitbox",6,"◇")
-local aE,aF=CreateTab("Settings",7,"⚙")
+local as,at=CreateTab("Visuals",1,"VISUALS")
+local au,av=CreateTab("Combat",2,"COMBAT")local
+aw, ax=CreateTab("Player Fling",3,"FLING")
+local ay,az=CreateTab("Automation",4,"AUTO")
+local aA,aB=CreateTab("Macro",5,"MACRO")
+local aC,aD=CreateTab("Hitbox",6,"HITBOX")
+local aE,aF=CreateTab("Settings",7,"SETTINGS")
 
 ar=Instance.new"ScrollingFrame"
 ar.Name="SearchResults"
@@ -1028,15 +1120,74 @@ Y.Visible=not Y.Visible
 end)
 
 
-local aH=CreateCard(as,"👁️ ESP","Visuals")
+local notificationHolder=Instance.new("Frame")
+notificationHolder.Name="RoleNotifications"
+notificationHolder.Size=UDim2.new(0,300,0,90)
+notificationHolder.Position=UDim2.new(1,-320,0,18)
+notificationHolder.BackgroundTransparency=1
+notificationHolder.ZIndex=50
+notificationHolder.Parent=X
+
+local function ShowRoleNotification(player,role)
+    local card=Instance.new("Frame")
+    card.Size=UDim2.new(1,0,0,64)
+    card.BackgroundColor3=CurrentTheme.Card
+    card.BorderSizePixel=0
+    card.ZIndex=51
+    card.Parent=notificationHolder
+    Instance.new("UICorner",card).CornerRadius=UDim.new(0,10)
+    local stroke=Instance.new("UIStroke",card)
+    stroke.Color=CurrentTheme.Accent
+    stroke.Transparency=0.25
+    local title=Instance.new("TextLabel")
+    title.Size=UDim2.new(1,-20,0,22)
+    title.Position=UDim2.new(0,10,0,7)
+    title.BackgroundTransparency=1
+    title.Text="MODS IN SERVER"
+    title.Font=MenuFont
+    title.TextSize=11
+    title.TextColor3=CurrentTheme.Accent
+    title.TextXAlignment=Enum.TextXAlignment.Left
+    title.ZIndex=52
+    title.Parent=card
+    local body=Instance.new("TextLabel")
+    body.Size=UDim2.new(1,-20,0,22)
+    body.Position=UDim2.new(0,10,0,29)
+    body.BackgroundTransparency=1
+    body.Text=player.DisplayName.." joined - "..role
+    body.Font=MenuFont
+    body.TextSize=10
+    body.TextColor3=CurrentTheme.Text
+    body.TextXAlignment=Enum.TextXAlignment.Left
+    body.ZIndex=52
+    body.Parent=card
+    task.delay(5,function() if card then card:Destroy() end end)
+end
+
+local function CheckRole(player)
+    task.spawn(function()
+        local ok,role=pcall(function() return player:GetRoleInGroup(MOD_GROUP_ID) end)
+        if not ok or not role then return end
+        local r=string.lower(role)
+        if string.find(r,"developer",1,true) or string.find(r,"owner",1,true) or string.find(r,"mod",1,true) or string.find(r,"admin",1,true) then
+            if player~=g then ShowRoleNotification(player,role) end
+        end
+    end)
+end
+
+for _,player in ipairs(a:GetPlayers()) do CheckRole(player) end
+a.PlayerAdded:Connect(CheckRole)
+
+
+local aH=CreateCard(as,"ESP","Visuals")
 CreateToggle(aH,"Enabled",l,function(aI)l=aI RefreshAllESP()end,"Visuals",aH)
 CreateToggle(aH,"Show Health",m,function(aI)m=aI RefreshAllESP()end,"Visuals",aH)
 CreateToggle(aH,"Anti-Lag",n,function(aI)n=aI RefreshAllESP()end,"Visuals",aH)
 
 local aI=CreateCard(at,"Customization","Visuals")
-CreateButton(aI,"Font","Minecraft",function(aJ)
-C=4
-aJ.Text="Minecraft"
+CreateButton(aI,"Font",B[C].Name,function(aJ)
+C=(C%#B)+1
+aJ.Text=B[C].Name
 RefreshAllESP()
 end,"Visuals",aI)
 CreateButton(aI,"Enemy Color",D[E].Name,function(aJ)
@@ -1047,12 +1198,12 @@ RefreshAllESP()
 end,"Visuals",aI)
 
 
-local aJ=CreateCard(au,"🎯 Aim","Aimbot")
+local aJ=CreateCard(au,"AIM","Aimbot")
 CreateToggle(aJ,"Aim Assist",o,function(aK)o=aK if not aK then r=nil end end,"Aimbot",aJ)
 CreateToggle(aJ,"Exclude Friends",not p,function(aK)p=not aK end,"Aimbot",aJ)
 CreateToggle(aJ,"Target Head",s=="Head",function(aK)s=aK and"Head"or"HumanoidRootPart"end,"Aimbot",aJ)
 
-local aK=CreateCard(av,"⚙️ Behavior","Aimbot")
+local aK=CreateCard(av,"BEHAVIOR","Aimbot")
 CreateToggle(aK,"Smoothness",t,function(aL)t=aL end,"Aimbot",aK)
 CreateToggle(aK,"Prediction",v,function(aL)v=aL end,"Aimbot",aK)
 CreateButton(aK,"Aim Assist Key",q.Name,function(aL)
@@ -1076,7 +1227,7 @@ end,"Aimbot",aK)
 
 aw.Size=UDim2.new(1,0,1,0)
 ax.Visible=false
-local aL=CreateCard(aw,"💫 Select Target Player","Player Fling")
+local aL=CreateCard(aw," Select Target Player","Player Fling")
 
 local aM=Instance.new"ScrollingFrame"
 aM.Size=UDim2.new(1,0,0,210)
@@ -1214,7 +1365,7 @@ end)
 RefreshFlingPlayerList()
 
 
-local aT=CreateCard(ay,"⚡ Automation","Automation")
+local aT=CreateCard(ay," Automation","Automation")
 local aU=CreateToggle(aT,"Auto Clicker",w,function(aU)w=aU end,"Automation",aT)
 CreateToggle(aT,"Random Offset",x,function(aV)x=aV end,"Automation",aT)
 CreateButton(aT,"Auto Clicker Key",autoClickKey.Name,function(aV)
@@ -1235,7 +1386,7 @@ aW:Destroy()
 end)
 end,"Automation",aT)
 
-local aV=CreateCard(az,"⌁ Speed Settings","Automation")
+local aV=CreateCard(az," Speed Settings","Automation")
 local aW=CreateButton(aV,"Min Speed",tostring(M).."ms",function(aW)
 local aX=Instance.new"TextBox"
 aX.Size=UDim2.new(0,100,0,25)
@@ -1310,19 +1461,21 @@ CreateButton(aV,"Random Offset","35",function(aX)
 end,"Automation",aV)
 
 
-local aX=CreateCard(aE,"◇ Protection","Settings")
+local aX=CreateCard(aE,"PROTECTION","Settings")
 CreateToggle(aX,"Anti-Fling Protection",y,function(aY)y=aY end,"Settings",aX)
 
-local aY=CreateCard(aF,"⚙️ System","Settings")
+local aY=CreateCard(aF,"SYSTEM","Settings")
 CreateToggle(aY,"Master Switch",k,function(aZ)
 k=aZ
 if not aZ then r=nil z=false end
 RefreshAllESP()
 end,"Settings",aY)
 
-local aTheme=CreateCard(aE,"✦ Aesthetic","Settings")
-CreateButton(aTheme,"Theme",ThemeList[ThemeIndex].Name,function(btn)
-    btn.Text=NextTheme()
+local aTheme=CreateCard(aE,"AESTHETIC","Settings")
+CreateButton(aTheme,"Theme","Casual",function(btn)
+    ThemeIndex=1
+    ApplyTheme(ThemeList[1])
+    btn.Text="Casual"
 end,"Settings",aTheme)
 CreateButton(aTheme,"Sky",SkyList[SkyIndex],function(btn)
     btn.Text=NextSky()
@@ -1334,7 +1487,7 @@ CreateButton(aTheme,"Sky Reset","Default",function(btn)
 end,"Settings",aTheme)
 
 
-local aZ=CreateCard(aA,"⌘ Macro Controls","Macro")
+local aZ=CreateCard(aA,"MACRO CONTROLS","Macro")
 CreateButton(aZ,"Macro Key",O.Name,function(a_)
 local a0=O.Name
 local a1=Instance.new"TextBox"
@@ -1373,13 +1526,13 @@ a1:Destroy()
 end)
 end,"Macro",aZ)
 
-local a_=CreateCard(aB,"Macro Speed","Macro")
+local a_=CreateCard(aB,"MACRO SPEED","Macro")
 CreateButton(a_,"Speed","25 ms",function(a0)
 Q=Q+5
 if Q>100 then Q=0 end
 a0.Text=tostring(Q).." ms"
 end,"Macro",a_)
-CreateButton(a_,"Recommended","25–35 ms",function(a0)
+CreateButton(a_,"Recommended","25-35 ms",function(a0)
 Q=25
 a0.Text="25 ms"
 end,"Macro",a_)
@@ -1408,7 +1561,7 @@ a1:Destroy()
 end)
 end,"Macro",a_)
 
-local a0=CreateCard(aB,"ℹ️ Information","Macro")
+local a0=CreateCard(aB," Information","Macro")
 local a1=Instance.new"TextLabel"
 a1.Size=UDim2.new(1,0,0,70)
 a1.BackgroundTransparency=1
@@ -1424,7 +1577,7 @@ a1.Text='Recommended speed: 25\u{2013}35 ms\nLower values are faster but may cau
 
 a1.Parent=a0
 
-local a2=CreateCard(aA,"Status","Macro")
+local a2=CreateCard(aA,"STATUS","Macro")
 local a3=Instance.new"TextLabel"
 a3.Size=UDim2.new(1,0,0,24)
 a3.BackgroundTransparency=1
@@ -1436,7 +1589,7 @@ a3.TextXAlignment=Enum.TextXAlignment.Left
 a3.Parent=a2
 
 
-local a4=CreateCard(aC,"📦 Hitbox Controls","Hitbox")
+local a4=CreateCard(aC,"HITBOX CONTROLS","Hitbox")
 CreateButton(a4,"Hitbox Expander","OFF",function(a5)
 S=not S
 a5.Text=S and"ON"or"OFF"
@@ -1458,7 +1611,7 @@ W=not W
 a5.Text=W and"ON"or"OFF"
 end,"Hitbox",a4)
 
-local a5=CreateCard(aD,"🎨 Hitbox Size & Visuals","Hitbox")
+local a5=CreateCard(aD,"HITBOX SIZE & VISUALS","Hitbox")
 CreateButton(a5,"Default Size","10 studs",function(a6)
 T=10
 a6.Text="10 studs"
@@ -1504,7 +1657,7 @@ a7:Destroy()
 end)
 end,"Hitbox",a5)
 
-local a6=CreateCard(aD,"ℹ️ Information","Hitbox")
+local a6=CreateCard(aD,"INFORMATION","Hitbox")
 local a7=Instance.new"TextLabel"
 a7.Size=UDim2.new(1,0,0,70)
 a7.BackgroundTransparency=1
@@ -1514,29 +1667,74 @@ a7.TextXAlignment=Enum.TextXAlignment.Left
 a7.Font=Enum.Font.Arcade
 a7.TextSize=10
 a7.TextColor3=Color3.fromRGB(145,150,170)
-a7.Text='\u{2022} Expands target hitboxes to make shots hit easier.\n\u{2022} Recommended Size: 10 - 25 studs.\n\u{2022} Transparency: 1 = Completely Invisible, 0.5 = Semi-visible.\n\u{2022} Team Check prevents expanding teammates.'
+a7.Text='- Expands target hitboxes to make shots hit easier.\n- Recommended Size: 10 - 25 studs.\n- Transparency: 1 = Completely Invisible, 0.5 = Semi-visible.\n- Team Check prevents expanding teammates.'
 
 
 
 
 a7.Parent=a6
 
-local a8=CreateCard(aC,"📊 Status","Hitbox")
+local a8=CreateCard(aC,"STATUS","Hitbox")
 local a9=Instance.new"TextLabel"
 a9.Size=UDim2.new(1,0,0,24)
 a9.BackgroundTransparency=1
 a9.Text="Hitbox Status: OFF"
-a9.Font=Enum.Font.Arcade
+a9.Font=MenuFont
 a9.TextSize=11
 a9.TextColor3=Color3.fromRGB(150,155,175)
 a9.TextXAlignment=Enum.TextXAlignment.Left
 a9.Parent=a8
 
 
+local shaderCard=CreateCard(as,"SHADERS","Visuals")
+local Lighting=game:GetService("Lighting")
+local function GetOrCreateEffect(className,name)
+    local effect=Lighting:FindFirstChild(name)
+    if not effect then effect=Instance.new(className); effect.Name=name; effect.Parent=Lighting end
+    return effect
+end
+local bloom=GetOrCreateEffect("BloomEffect","AETE_Bloom")
+bloom.Enabled=false
+bloom.Intensity=0.65
+bloom.Size=24
+bloom.Threshold=0.8
+local colorFx=GetOrCreateEffect("ColorCorrectionEffect","AETE_Color")
+colorFx.Enabled=false
+colorFx.Contrast=0.08
+colorFx.Saturation=0.05
+local rays=GetOrCreateEffect("SunRaysEffect","AETE_SunRays")
+rays.Enabled=false
+rays.Intensity=0.08
+rays.Spread=0.75
+local blurFx=GetOrCreateEffect("BlurEffect","AETE_Blur")
+blurFx.Enabled=false
+blurFx.Size=2
+CreateToggle(shaderCard,"Bloom",false,function(v) bloom.Enabled=v end,"Visuals",shaderCard)
+CreateToggle(shaderCard,"Color Correction",false,function(v) colorFx.Enabled=v end,"Visuals",shaderCard)
+CreateToggle(shaderCard,"Sun Rays",false,function(v) rays.Enabled=v end,"Visuals",shaderCard)
+CreateToggle(shaderCard,"Soft Blur",false,function(v) blurFx.Enabled=v end,"Visuals",shaderCard)
+
+
+local fontCard=CreateCard(at,"Text Style","Visuals")
+CreateButton(fontCard,"ESP Font",B[C].Name,function(btn)
+    C=(C%#B)+1
+    btn.Text=B[C].Name
+    RefreshAllESP()
+end,"Visuals",fontCard)
+CreateButton(fontCard,"Menu Font",B[MenuFontIndex].Name,function(btn)
+    MenuFontIndex=(MenuFontIndex%#B)+1
+    MenuFont=B[MenuFontIndex].Font
+    btn.Text=B[MenuFontIndex].Name
+    ApplyTheme(CurrentTheme)
+end,"Visuals",fontCard)
+
 ApplyTheme=function(theme)
     CurrentTheme=theme or ThemeList[1]
     pcall(function()
         Y.BackgroundColor3=CurrentTheme.Panel
+        menuBackground.Image=MENU_BACKGROUND_ASSET
+        menuIcon.Image=MENU_ICON_ASSET
+        cornerIcon.Image=CORNER_ICON_ASSET
         aestheticGradient.Color=ColorSequence.new({
             ColorSequenceKeypoint.new(0,CurrentTheme.Panel),
             ColorSequenceKeypoint.new(0.48,CurrentTheme.Card),
@@ -1563,15 +1761,15 @@ ApplyTheme=function(theme)
                 else
                     obj.TextColor3=CurrentTheme.Text
                 end
-                obj.Font=Enum.Font.Arcade
+                obj.Font=MenuFont
 
             elseif obj:IsA("TextBox") then
                 obj.TextColor3=CurrentTheme.Text
                 obj.PlaceholderColor3=CurrentTheme.Muted
-                obj.Font=Enum.Font.Arcade
+                obj.Font=MenuFont
 
             elseif obj:IsA("TextButton") then
-                obj.Font=Enum.Font.Arcade
+                obj.Font=MenuFont
 
                 if string.match(obj.Name,"Nav$") then
                     obj.BackgroundColor3=CurrentTheme.Card2
@@ -1595,7 +1793,7 @@ ApplyTheme=function(theme)
                     obj.TextColor3=CurrentTheme.Text
 
                 elseif obj.Parent and string.find(obj.Parent.Name,"Setting_") then
-                    -- Toggle buttons have no text. Read the knob position to preserve ON/OFF state.
+             
                     local knob=obj:FindFirstChildOfClass("Frame")
                     if knob then
                         obj.BackgroundColor3=(knob.Position.X.Scale > 0.5) and CurrentTheme.Accent or CurrentTheme.Button
