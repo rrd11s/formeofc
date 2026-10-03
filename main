@@ -42,72 +42,102 @@ local autoClickKey=Enum.KeyCode.E
 local r
 local w=false
 
--- Aimbot + Auto Clicker emergency key pause.
--- Only Z/X/C temporarily pause both features. Q/E keep their normal hotkeys.
-local keyPauseEnabled=false
-local keyPauseKeys={
+-- TVL2 + Bewitched hold-to-pause controls.
+-- TVL2: hold Z/X/C to pause Aimbot lock + Auto, release to restore immediately.
+-- Bewitched: hold Q/E/R to pause Aimbot lock + Auto, release to restore immediately.
+local tvl2Enabled=false
+local bewitchedEnabled=false
+
+local tvl2Keys={
     [Enum.KeyCode.Z]=true,
     [Enum.KeyCode.X]=true,
     [Enum.KeyCode.C]=true
 }
-local keyPauseHeld={}
-local keyPauseCount=0
-local keyPauseWasAimbot=false
-local keyPauseWasAuto=false
-local keyPauseTarget=nil
+local bewitchedKeys={
+    [Enum.KeyCode.Q]=true,
+    [Enum.KeyCode.E]=true,
+    [Enum.KeyCode.R]=true
+}
+
+local tvl2Held={}
+local bewitchedHeld={}
+local pauseCount=0
+local pauseWasAimbot=false
+local pauseWasAuto=false
+local pauseTarget=nil
 
 local function IsKeyPauseHeld()
-    return keyPauseCount>0
+    return pauseCount>0
 end
 
-local function StartKeyPause(keyCode)
-    if not keyPauseEnabled or not keyPauseKeys[keyCode] then
+local function StartPause(mode,keyCode)
+    local enabled=(mode=="TVL2" and tvl2Enabled) or (mode=="Bewitched" and bewitchedEnabled)
+    local held=(mode=="TVL2" and tvl2Held or bewitchedHeld)
+    local keys=(mode=="TVL2" and tvl2Keys or bewitchedKeys)
+    if not enabled or not keys[keyCode] then
         return false
     end
-    if keyPauseHeld[keyCode] then
+    if held[keyCode] then
         return true
     end
 
-    if keyPauseCount==0 then
-        keyPauseWasAimbot=o
-        keyPauseWasAuto=w
-        -- Keep the currently locked target so it can be restored after release.
-        keyPauseTarget=r
+    if pauseCount==0 then
+        pauseWasAimbot=o
+        pauseWasAuto=w
+        pauseTarget=r
     end
 
-    keyPauseHeld[keyCode]=true
-    keyPauseCount+=1
-
-    -- Pause the features without deleting the current lock.
+    held[keyCode]=true
+    pauseCount+=1
     o=false
     w=false
-
     return true
 end
 
-local function EndKeyPause(keyCode)
-    if not keyPauseHeld[keyCode] then
+local function EndPause(mode,keyCode)
+    local held=(mode=="TVL2" and tvl2Held or bewitchedHeld)
+    if not held[keyCode] then
         return
     end
 
-    keyPauseHeld[keyCode]=nil
-    keyPauseCount=math.max(0,keyPauseCount-1)
+    held[keyCode]=nil
+    pauseCount=math.max(0,pauseCount-1)
 
-    -- Restore only after every pause key has been released.
-    if keyPauseCount==0 then
-        o=keyPauseWasAimbot
-        w=keyPauseWasAuto
+    if pauseCount==0 then
+        o=pauseWasAimbot
+        w=pauseWasAuto
         if o then
-            -- Restore the exact target that was locked before Z/X/C was pressed.
-            if keyPauseTarget and keyPauseTarget.Parent then
-                r=keyPauseTarget
+            if pauseTarget and pauseTarget.Parent then
+                r=pauseTarget
             else
                 r=GetClosestTarget()
             end
         else
             r=nil
         end
-        keyPauseTarget=nil
+        pauseTarget=nil
+    end
+end
+
+local function DisablePauseMode(mode)
+    local held=(mode=="TVL2" and tvl2Held or bewitchedHeld)
+    for keyCode,_ in pairs(held) do
+        held[keyCode]=nil
+        pauseCount=math.max(0,pauseCount-1)
+    end
+    if pauseCount==0 then
+        o=pauseWasAimbot
+        w=pauseWasAuto
+        if o then
+            if pauseTarget and pauseTarget.Parent then
+                r=pauseTarget
+            else
+                r=GetClosestTarget()
+            end
+        else
+            r=nil
+        end
+        pauseTarget=nil
     end
 end
 
@@ -1304,12 +1334,16 @@ CreateToggle(aJ,"Aim Assist",o,function(aK)
     if not aK then r=nil end
 end,"Aimbot",aJ)
 CreateToggle(aJ,"Exclude Friends",not p,function(aK)p=not aK end,"Aimbot",aJ)
-CreateToggle(aJ,"Pause Aimbot + Auto on Z/X/C",keyPauseEnabled,function(aK)
-    keyPauseEnabled=aK
+CreateToggle(aJ,"TVL2 (Hold Z/X/C)",tvl2Enabled,function(aK)
+    tvl2Enabled=aK
     if not aK then
-        keyPauseHeld={}
-        keyPauseCount=0
-        keyPauseTarget=nil
+        DisablePauseMode("TVL2")
+    end
+end,"Aimbot",aJ)
+CreateToggle(aJ,"Bewitched (Hold Q/E/R)",bewitchedEnabled,function(aK)
+    bewitchedEnabled=aK
+    if not aK then
+        DisablePauseMode("Bewitched")
     end
 end,"Aimbot",aJ)
 CreateToggle(aJ,"Target Head",s=="Head",function(aK)s=aK and"Head"or"HumanoidRootPart"end,"Aimbot",aJ)
@@ -1963,8 +1997,8 @@ return
 end
 if bb then return end
 
--- Only Z/X/C are pause keys, so Q and E remain available for lock/auto.
-if StartKeyPause(ba.KeyCode) then
+-- TVL2 has Z/X/C and Bewitched has Q/E/R. Both are hold-to-pause.
+if StartPause("TVL2",ba.KeyCode) or StartPause("Bewitched",ba.KeyCode) then
     return
 end
 
@@ -1983,7 +2017,8 @@ end)
 
 b.InputEnded:Connect(function(ba,bb)
 if bb then return end
-EndKeyPause(ba.KeyCode)
+EndPause("TVL2",ba.KeyCode)
+EndPause("Bewitched",ba.KeyCode)
 end)
 
 b.InputBegan:Connect(function(ba,bb)
