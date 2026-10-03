@@ -40,13 +40,82 @@ local p=false
 local q=Enum.KeyCode.Q
 local autoClickKey=Enum.KeyCode.E
 local r
+local w=false
+
+-- Aimbot + Auto Clicker emergency key pause.
+-- Only Z/X/C temporarily pause both features. Q/E keep their normal hotkeys.
+local keyPauseEnabled=false
+local keyPauseKeys={
+    [Enum.KeyCode.Z]=true,
+    [Enum.KeyCode.X]=true,
+    [Enum.KeyCode.C]=true
+}
+local keyPauseHeld={}
+local keyPauseCount=0
+local keyPauseWasAimbot=false
+local keyPauseWasAuto=false
+local keyPauseTarget=nil
+
+local function IsKeyPauseHeld()
+    return keyPauseCount>0
+end
+
+local function StartKeyPause(keyCode)
+    if not keyPauseEnabled or not keyPauseKeys[keyCode] then
+        return false
+    end
+    if keyPauseHeld[keyCode] then
+        return true
+    end
+
+    if keyPauseCount==0 then
+        keyPauseWasAimbot=o
+        keyPauseWasAuto=w
+        -- Keep the currently locked target so it can be restored after release.
+        keyPauseTarget=r
+    end
+
+    keyPauseHeld[keyCode]=true
+    keyPauseCount+=1
+
+    -- Pause the features without deleting the current lock.
+    o=false
+    w=false
+
+    return true
+end
+
+local function EndKeyPause(keyCode)
+    if not keyPauseHeld[keyCode] then
+        return
+    end
+
+    keyPauseHeld[keyCode]=nil
+    keyPauseCount=math.max(0,keyPauseCount-1)
+
+    -- Restore only after every pause key has been released.
+    if keyPauseCount==0 then
+        o=keyPauseWasAimbot
+        w=keyPauseWasAuto
+        if o then
+            -- Restore the exact target that was locked before Z/X/C was pressed.
+            if keyPauseTarget and keyPauseTarget.Parent then
+                r=keyPauseTarget
+            else
+                r=GetClosestTarget()
+            end
+        else
+            r=nil
+        end
+        keyPauseTarget=nil
+    end
+end
 
 local s="HumanoidRootPart"
 local t=false
 local u=0.3
 local v=false
 
-local w=false
 local x=true
 
 local y=false
@@ -163,9 +232,39 @@ if k and w then
     intervalMs=math.random(math.floor(low),math.floor(high))
 
     local clicked=pcall(function()
-        if type(mouse1click)=="function" then
+        local clickX,clickY=h.X,h.Y
+        local hasAimTarget=false
+
+        -- Aimbot acik ve secili hedef varsa hedefe tikla.
+        -- Aimbot kapaliysa veya hedef yoksa normal mouse konumuna tikla.
+        if o and r and r.Character then
+            local targetPart=r.Character:FindFirstChild(s) or r.Character:FindFirstChild("HumanoidRootPart")
+            local humanoid=r.Character:FindFirstChildOfClass("Humanoid")
+
+            if targetPart and humanoid and humanoid.Health>0 then
+                local targetPos=targetPart.Position
+
+                if v then
+                    targetPos=targetPos+(targetPart.AssemblyLinearVelocity*0.12)
+                end
+
+                local screenPos,onScreen=i:WorldToViewportPoint(targetPos)
+                if onScreen then
+                    clickX,clickY=screenPos.X,screenPos.Y
+                    hasAimTarget=true
+                end
+            end
+        end
+
+        -- Hedefli tiklama: ekran koordinatini kullan.
+        if hasAimTarget and f then
+            f:SendMouseButtonEvent(clickX,clickY,0,true,game,1)
+            task.wait()
+            f:SendMouseButtonEvent(clickX,clickY,0,false,game,1)
+        -- Normal Auto Clicker: mouseun oldugu yere tikla.
+        elseif not hasAimTarget and type(mouse1click)=="function" then
             mouse1click()
-        elseif f and h then
+        elseif f then
             f:SendMouseButtonEvent(h.X,h.Y,0,true,game,1)
             task.wait()
             f:SendMouseButtonEvent(h.X,h.Y,0,false,game,1)
@@ -1199,8 +1298,20 @@ end,"Visuals",aI)
 
 
 local aJ=CreateCard(au,"AIM","Aimbot")
-CreateToggle(aJ,"Aim Assist",o,function(aK)o=aK if not aK then r=nil end end,"Aimbot",aJ)
+CreateToggle(aJ,"Aim Assist",o,function(aK)
+    if IsKeyPauseHeld() then return end
+    o=aK
+    if not aK then r=nil end
+end,"Aimbot",aJ)
 CreateToggle(aJ,"Exclude Friends",not p,function(aK)p=not aK end,"Aimbot",aJ)
+CreateToggle(aJ,"Pause Aimbot + Auto on Z/X/C",keyPauseEnabled,function(aK)
+    keyPauseEnabled=aK
+    if not aK then
+        keyPauseHeld={}
+        keyPauseCount=0
+        keyPauseTarget=nil
+    end
+end,"Aimbot",aJ)
 CreateToggle(aJ,"Target Head",s=="Head",function(aK)s=aK and"Head"or"HumanoidRootPart"end,"Aimbot",aJ)
 
 local aK=CreateCard(av,"BEHAVIOR","Aimbot")
@@ -1366,7 +1477,10 @@ RefreshFlingPlayerList()
 
 
 local aT=CreateCard(ay," Automation","Automation")
-local aU=CreateToggle(aT,"Auto Clicker",w,function(aU)w=aU end,"Automation",aT)
+local aU=CreateToggle(aT,"Auto Clicker",w,function(aU)
+    if IsKeyPauseHeld() then return end
+    w=aU
+end,"Automation",aT)
 CreateToggle(aT,"Random Offset",x,function(aV)x=aV end,"Automation",aT)
 CreateButton(aT,"Auto Clicker Key",autoClickKey.Name,function(aV)
 local aW=Instance.new"TextBox"
@@ -1849,6 +1963,11 @@ return
 end
 if bb then return end
 
+-- Only Z/X/C are pause keys, so Q and E remain available for lock/auto.
+if StartKeyPause(ba.KeyCode) then
+    return
+end
+
 if ba.KeyCode==autoClickKey then
 w=not w
 aU(w)
@@ -1860,6 +1979,11 @@ else
 r=GetClosestTarget()
 end
 end
+end)
+
+b.InputEnded:Connect(function(ba,bb)
+if bb then return end
+EndKeyPause(ba.KeyCode)
 end)
 
 b.InputBegan:Connect(function(ba,bb)
